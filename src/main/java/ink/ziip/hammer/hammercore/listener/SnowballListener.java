@@ -14,8 +14,8 @@ public class SnowballListener extends BaseListener {
             Entity entity = event.getHitEntity();
             if (entity != null) {
                 if (entity instanceof LivingEntity) {
-                    entity.setVelocity(event.getEntity().getLocation().getDirection().multiply(2));
-                    ((org.bukkit.entity.LivingEntity) entity).damage(3);
+                    entity.setVelocity(event.getEntity().getLocation().getDirection().multiply(ink.ziip.hammer.hammercore.manager.ConfigManager.SNOWBALL_VELOCITY_MULTIPLIER));
+                    ((org.bukkit.entity.LivingEntity) entity).damage(ink.ziip.hammer.hammercore.manager.ConfigManager.SNOWBALL_DAMAGE);
                 }
             }
         }

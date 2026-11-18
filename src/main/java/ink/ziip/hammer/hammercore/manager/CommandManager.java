@@ -8,6 +8,8 @@ import ink.ziip.hammer.hammercore.command.sub.AdminCommand;
 import ink.ziip.hammer.hammercore.command.sub.RideCommand;
 import ink.ziip.hammer.hammercore.command.sub.SayCommand;
 import ink.ziip.hammer.hammercore.command.sub.ToggleCommand;
+import ink.ziip.hammer.hammercore.command.sub.ReloadSubCommand;
+import ink.ziip.hammer.hammercore.command.sub.StatusSubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
@@ -40,14 +42,18 @@ public class CommandManager extends BaseManager {
         this.mainCommand.addSubCommand(new RideCommand());
         this.mainCommand.addSubCommand(new SayCommand());
         this.mainCommand.addSubCommand(new ToggleCommand());
+        this.mainCommand.addSubCommand(new ReloadSubCommand());
+        this.mainCommand.addSubCommand(new StatusSubCommand());
 
         if (this.corePluginCommand != null) {
             this.corePluginCommand.setExecutor(this.mainCommand);
             this.corePluginCommand.setTabCompleter(this.mainCommand);
         }
 
-        menuPluginCommand.setExecutor(this.menuCommand);
-        menuPluginCommand.setTabCompleter(this.menuCommand);
+        if (this.menuPluginCommand != null) {
+            this.menuPluginCommand.setExecutor(this.menuCommand);
+            this.menuPluginCommand.setTabCompleter(this.menuCommand);
+        }
     }
 
     @Override
@@ -58,8 +64,8 @@ public class CommandManager extends BaseManager {
             commandMapField.setAccessible(true);
             CommandMap commandMap = (SimpleCommandMap) commandMapField.get(Bukkit.getServer());
 
-            corePluginCommand.unregister(commandMap);
-            menuPluginCommand.unregister(commandMap);
+            if (corePluginCommand != null) corePluginCommand.unregister(commandMap);
+            if (menuPluginCommand != null) menuPluginCommand.unregister(commandMap);
         } catch (Exception e) {
             HammerCore.getInstance().getLogger().log(Level.WARNING, "Unregister commands failed.");
         }
@@ -67,6 +73,6 @@ public class CommandManager extends BaseManager {
 
     @Override
     public void reload() {
-
+        load();
     }
 }

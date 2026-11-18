@@ -2,6 +2,7 @@ package ink.ziip.hammer.hammercore.tasks.bar;
 
 import ink.ziip.hammer.hammercore.api.object.user.HammerUser;
 import ink.ziip.hammer.hammercore.api.task.BaseTask;
+import ink.ziip.hammer.hammercore.manager.ConfigManager;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -22,7 +23,7 @@ public class BossBarTask extends BaseTask {
     private static final Map<UUID, BossBar> infobarMap = new ConcurrentHashMap<>();
 
     private BossBarTask() {
-        super(40);
+        super(ConfigManager.INFO_BAR_REFRESH_TICKS);
     }
 
     public static BossBarTask getInstance() {
@@ -35,8 +36,10 @@ public class BossBarTask extends BaseTask {
     @Override
     public void start() {
         super.start();
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            addToAll(player);
+        if (ConfigManager.INFO_BAR_ENABLED) {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                addToAll(player);
+            }
         }
     }
 
@@ -45,13 +48,14 @@ public class BossBarTask extends BaseTask {
         if (started) {
             new HashSet<>(infobarMap.keySet()).forEach(playerUUID -> infobarMap.get(playerUUID).removeAll());
             infobarMap.clear();
-            cancel();
+            started = false;
+            cancelTask();
         }
     }
 
     @Override
     public void run() {
-        if (started) {
+        if (started && ConfigManager.INFO_BAR_ENABLED) {
             for (Player player : Bukkit.getOnlinePlayers()) {
                 BossBar bossBar = infobarMap.get(player.getUniqueId());
                 if (bossBar != null)
@@ -61,27 +65,27 @@ public class BossBarTask extends BaseTask {
     }
 
     private static BossBar createBossBar() {
-        return Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+        try {
+            return Bukkit.createBossBar("", BarColor.valueOf(ConfigManager.INFO_BAR_BAR_COLOR),
+                    BarStyle.valueOf(ConfigManager.INFO_BAR_BAR_STYLE));
+        } catch (IllegalArgumentException exception) {
+            return Bukkit.createBossBar("", BarColor.WHITE, BarStyle.SOLID);
+        }
     }
 
     public void updateBossBar(BossBar bossbar, Player player) {
         HammerUser hammerUser = HammerUser.getUser(player);
         String worldName = player.getWorld().getName();
+        String infoContent;
         if (hammerUser.isBedrockPlayer()) {
-            String infoContent = INFO_BAR_CONTENT_BEDROCK_WORLD_LIST.get(worldName);
-            if (infoContent != null) {
-                bossbar.setTitle(hammerUser.setPlaceholders(infoContent));
-                return;
-            }
-            bossbar.setTitle(hammerUser.setPlaceholders(INFO_BAR_CONTENT_BEDROCK_DEFAULT));
-            return;
+            infoContent = INFO_BAR_CONTENT_BEDROCK_WORLD_LIST.get(worldName);
+            if (infoContent == null) infoContent = INFO_BAR_CONTENT_BEDROCK_DEFAULT;
+        } else {
+            infoContent = INFO_BAR_CONTENT_JAVA_WORLD_LIST.get(worldName);
+            if (infoContent == null) infoContent = INFO_BAR_CONTENT_JAVA_DEFAULT;
         }
-        String infoContent = INFO_BAR_CONTENT_JAVA_WORLD_LIST.get(worldName);
-        if (infoContent != null) {
-            bossbar.setTitle(hammerUser.setPlaceholders(infoContent));
-            return;
-        }
-        bossbar.setTitle(hammerUser.setPlaceholders(INFO_BAR_CONTENT_JAVA_DEFAULT));
+        if (infoContent == null) infoContent = "";
+        bossbar.setTitle(hammerUser.setPlaceholders(infoContent));
     }
 
     public static void addToAll(Player player) {

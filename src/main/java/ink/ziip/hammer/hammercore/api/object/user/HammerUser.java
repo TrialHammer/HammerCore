@@ -22,7 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.geysermc.floodgate.api.FloodgateApi;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,13 +57,13 @@ public class HammerUser {
     private Long dropItemsTime = 0L;
 
     public boolean canUseMagicStick() {
-        return System.currentTimeMillis() - magicStickPendingTime > 120000;
+        return System.currentTimeMillis() - magicStickPendingTime > ink.ziip.hammer.hammercore.manager.ConfigManager.magicStickCooldownMillis();
     }
 
     public void useMagicStick() {
         magicStickUsingTimes++;
 
-        if (magicStickUsingTimes == 10) {
+        if (magicStickUsingTimes == ink.ziip.hammer.hammercore.manager.ConfigManager.magicStickUses()) {
             magicStickPendingTime = System.currentTimeMillis();
             magicStickUsingTimes = 0;
         }
@@ -201,7 +201,8 @@ public class HammerUser {
         if (player == null)
             return null;
 
-        return getTarget(player, player.getNearbyEntities(50, 50, 50));
+        double range = ink.ziip.hammer.hammercore.manager.ConfigManager.TARGET_RANGE;
+        return getTarget(player, player.getNearbyEntities(range, range, range));
     }
 
     // Source: https://bukkit.org/threads/get-entity-player-is-looking.300661/#post-2727103
@@ -212,7 +213,7 @@ public class HammerUser {
         T target = null;
         final Location entityLocation = entity.getLocation();
         final Vector entityVector = entityLocation.toVector();
-        final double threshold = 1;
+        final double threshold = ink.ziip.hammer.hammercore.manager.ConfigManager.TARGET_THRESHOLD;
 
         for (final T other : entities) {
             Vector otherEntityVector = other.getLocation().toVector();

@@ -19,10 +19,11 @@ public class MenuCommand implements CommandExecutor, TabCompleter {
         Player player = hammerUser.getPlayer();
 
         if (player != null) {
-            if (player.hasPermission("group.player")) {
-                player.performCommand("dm open main_menu");
-            } else {
-                player.performCommand("tutorial 5");
+            String commandToRun = player.hasPermission(ink.ziip.hammer.hammercore.manager.ConfigManager.QUICK_MENU_PERMISSION)
+                    ? ink.ziip.hammer.hammercore.manager.ConfigManager.QUICK_MENU_COMMAND
+                    : ink.ziip.hammer.hammercore.manager.ConfigManager.QUICK_FALLBACK_MENU_COMMAND;
+            if (commandToRun != null && !commandToRun.isBlank()) {
+                player.performCommand(commandToRun);
             }
         }
 

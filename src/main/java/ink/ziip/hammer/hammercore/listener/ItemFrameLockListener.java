@@ -1,5 +1,6 @@
 package ink.ziip.hammer.hammercore.listener;
 
+import ink.ziip.hammer.hammercore.HammerCore;
 import ink.ziip.hammer.hammercore.api.listener.BaseListener;
 import ink.ziip.hammer.hammercore.api.object.lock.ItemFrameLock;
 import ink.ziip.hammer.hammercore.api.object.user.HammerUser;
@@ -15,86 +16,78 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.Map;
+
 public class ItemFrameLockListener extends BaseListener {
 
     @EventHandler
     public void onPlayerInteractItemFrameLock(PlayerInteractEntityEvent event) {
+        if (!(event.getRightClicked() instanceof ItemFrame itemFrame)) return;
         Player player = event.getPlayer();
-        if (event.getRightClicked() instanceof ItemFrame itemFrame) {
-            if (player.isSneaking()) {
-                ItemMeta itemMeta = itemFrame.getItem().getItemMeta();
-                if (itemMeta != null) {
-                    if (itemMeta.hasLore()) {
-                        for (String lore : itemMeta.getLore()) {
-                            if (Utils.isTeleportationItem(lore)) {
-                                return;
-                            }
-                        }
-                    }
+
+        if (player.isSneaking()) {
+            ItemMeta itemMeta = itemFrame.getItem().getItemMeta();
+            if (itemMeta != null && itemMeta.hasLore()) {
+                for (String lore : itemMeta.getLore()) {
+                    if (Utils.isTeleportationItem(lore)) return;
                 }
             }
+        }
 
-            HammerUser hammerUser = HammerUser.getUser(player);
-            ItemFrameLock itemFrameLock = ItemFrameLock.getItemFrameLock(itemFrame);
-            if (player.isSneaking() && itemFrame.getItem().getType() != Material.AIR) {
-                if (!itemFrameLock.hasOwner()) {
-                    itemFrameLock.setOwner(player);
-                    hammerUser.sendActionBar("&c你成为了这个展示框的所有者", false);
-                    event.setCancelled(true);
-                    return;
-                } else {
-                    if (itemFrameLock.isOwner(player)) {
-                        itemFrameLock.removeOwner();
-                        hammerUser.sendActionBar("&c解除了展示框的锁定", false);
-                    } else {
-                        hammerUser.sendActionBar("&7这个展示框的所有者为：" + itemFrameLock.getOwnerName(), false);
-                    }
-                }
+        HammerUser hammerUser = HammerUser.getUser(player);
+        ItemFrameLock itemFrameLock = ItemFrameLock.getItemFrameLock(itemFrame);
+        if (player.isSneaking() && itemFrame.getItem().getType() != Material.AIR) {
+            if (!itemFrameLock.hasOwner()) {
+                itemFrameLock.setOwner(player);
+                hammerUser.sendActionBar(message("item-frame.now-owned", Map.of()), false);
                 event.setCancelled(true);
                 return;
             }
-            if (!itemFrameLock.isOwner(player)) {
-                hammerUser.sendActionBar("&7这个展示框的所有者为：" + itemFrameLock.getOwnerName(), false);
-                event.setCancelled(true);
+            if (itemFrameLock.isOwner(player)) {
+                itemFrameLock.removeOwner();
+                hammerUser.sendActionBar(message("item-frame.unlocked", Map.of()), false);
+            } else {
+                hammerUser.sendActionBar(message("item-frame.locked-by-owner",
+                        Map.of("owner", String.valueOf(itemFrameLock.getOwnerName()))), false);
             }
+            event.setCancelled(true);
+            return;
+        }
+
+        if (!itemFrameLock.isOwner(player)) {
+            hammerUser.sendActionBar(message("item-frame.locked-by-owner",
+                    Map.of("owner", String.valueOf(itemFrameLock.getOwnerName()))), false);
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onPlayerBreakItemFrame(EntityDamageByEntityEvent event) {
         Entity entity = event.getEntity();
-        if (entity instanceof ItemFrame itemFrame) {
-            ItemFrameLock itemFrameLock = ItemFrameLock.getItemFrameLock(itemFrame);
-
-            if (itemFrameLock.hasOwner()) {
-                if (event.getDamager() instanceof Player player) {
-                    HammerUser hammerUser = HammerUser.getUser(player);
-                    if (itemFrameLock.isOwner(player)) {
-                        return;
-                    }
-                    hammerUser.sendActionBar("&7这个展示框的所有者为：" + itemFrameLock.getOwnerName(), false);
-                    event.setCancelled(true);
-                    return;
-                }
-                event.setCancelled(true);
-            }
+        if (!(entity instanceof ItemFrame itemFrame)) return;
+        ItemFrameLock lock = ItemFrameLock.getItemFrameLock(itemFrame);
+        if (!lock.hasOwner()) return;
+        if (event.getDamager() instanceof Player player) {
+            if (lock.isOwner(player)) return;
+            HammerUser.getUser(player).sendActionBar(message("item-frame.locked-by-owner",
+                    Map.of("owner", String.valueOf(lock.getOwnerName()))), false);
         }
+        event.setCancelled(true);
     }
 
     @EventHandler
     public void onPlayerBreakItemFrame(EntityDamageByBlockEvent event) {
-        Entity entity = event.getEntity();
-        if (entity instanceof ItemFrame itemFrame) {
-            ItemFrameLock itemFrameLock = ItemFrameLock.getItemFrameLock(itemFrame);
-
-            if (itemFrameLock.hasOwner()) {
-                event.setCancelled(true);
-            }
+        if (event.getEntity() instanceof ItemFrame itemFrame && ItemFrameLock.getItemFrameLock(itemFrame).hasOwner()) {
+            event.setCancelled(true);
         }
     }
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event) {
-        // TODO
+        // Intentionally reserved for future item-frame block ownership rules.
+    }
+
+    private String message(String key, Map<String, String> placeholders) {
+        return HammerCore.getInstance().getMessageManager().format(key, placeholders);
     }
 }

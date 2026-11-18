@@ -4,6 +4,7 @@ import ink.ziip.hammer.hammercore.HammerCore;
 import ink.ziip.hammer.hammercore.api.command.BaseSubCommand;
 import ink.ziip.hammer.hammercore.api.object.user.HammerUser;
 import ink.ziip.hammer.hammercore.api.util.Utils;
+import ink.ziip.hammer.hammercore.manager.ConfigManager;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import net.coreprotect.listener.player.PlayerDropItemListener;
@@ -24,33 +25,35 @@ import java.util.*;
 
 public class AdminCommand extends BaseSubCommand {
 
-    private static final CoreProtectAPI coreProtectAPI = CoreProtect.getInstance().getAPI();
+    /** Resolved lazily so CoreProtect remains a true optional dependency. */
+    private static CoreProtectAPI coreProtectAPI;
+    private static boolean coreProtectResolved;
 
-    private final String[] commandList = new String[]{
-            "talk",
-            "give-random-effect",
-            "give-levitation-effect",
-            "remove-main-hand",
-            "sonic-boom",
-    };
-
-    public AdminCommand() {
-        super("admin");
+    private static CoreProtectAPI coreProtectApi() {
+        if (!coreProtectResolved) {
+            coreProtectResolved = true;
+            try {
+                if (Bukkit.getPluginManager().getPlugin("CoreProtect") != null) {
+                    coreProtectAPI = CoreProtect.getInstance().getAPI();
+                }
+            } catch (Throwable ignored) {
+                coreProtectAPI = null;
+            }
+        }
+        return coreProtectAPI;
     }
+    private final String[] commandList = {"talk", "give-random-effect", "give-levitation-effect", "remove-main-hand", "sonic-boom"};
+
+    public AdminCommand() { super("admin"); }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length < 1) {
-            return true;
-        }
+        if (args.length < 1) return true;
         if (args[0].equals("talk") && args.length == 3) {
             Player player = Bukkit.getPlayer(args[1]);
-            if (player != null) {
-                player.chat(args[2]);
-                return true;
-            }
+            if (player != null) player.chat(args[2]);
+            return true;
         }
-
         if (args[0].equals("give-random-effect") && args.length == 2) {
             Player player = Bukkit.getPlayer(args[1]);
             if (player != null) {
@@ -59,86 +62,85 @@ public class AdminCommand extends BaseSubCommand {
                 if (targetPlayer != null) {
                     if (hammerUser.canUseMagicStick()) {
                         List<Object> list = Utils.getRandomPotionEffect();
-                        targetPlayer.addPotionEffect(new PotionEffect((PotionEffectType) list.get(0), 100, 1));
-                        targetPlayer.sendMessage(Utils.translateColorCodes("&b[!] &3你被 " + hammerUser.getPlayer().getName() + " 施加了诡异的" + (String) list.get(1)));
-                        hammerUser.sendMessage("&b[!] &3你对 " + targetPlayer.getName() + " 施加了诡异的" + (String) list.get(1));
+                        targetPlayer.addPotionEffect(new PotionEffect((PotionEffectType) list.get(0), ConfigManager.RANDOM_EFFECT_DURATION_TICKS, ConfigManager.RANDOM_EFFECT_AMPLIFIER));
+                        HammerCore.getInstance().getMessageManager().send(targetPlayer,
+                                "admin.random-effect-target",
+                                Map.of("player", hammerUser.getPlayer().getName(), "effect", (String) list.get(1)));
+                        HammerCore.getInstance().getMessageManager().send(hammerUser.getPlayer(),
+                                "admin.random-effect-source",
+                                Map.of("target", targetPlayer.getName(), "effect", (String) list.get(1)));
                         hammerUser.useMagicStick();
                     } else {
-                        hammerUser.sendMessage("&b[!] &3你还没有足够的魔力。");
+                        HammerCore.getInstance().getMessageManager().send(hammerUser.getPlayer(),
+                                "admin.no-magic", Map.of());
                     }
                 }
-                return true;
             }
+            return true;
         }
-
         if (args[0].equals("remove-main-hand") && args.length == 2) {
             Player player = Bukkit.getPlayer(args[1]);
             if (player != null) {
-                HammerUser hammerUser = HammerUser.getUser(player);
-                Player targetPlayer = hammerUser.getTargetPlayer();
-                if (targetPlayer != null) {
-                    ItemStack itemStack = targetPlayer.getInventory().getItemInMainHand();
+                Player target = HammerUser.getUser(player).getTargetPlayer();
+                if (target != null) {
+                    ItemStack itemStack = target.getInventory().getItemInMainHand();
                     ItemStack newItemStack = itemStack.clone();
                     if (itemStack.getType() != Material.AIR) {
                         itemStack.setAmount(0);
                         Random random = new Random();
-                        if (targetPlayer.getLocation().getWorld() != null) {
-                            Location dropLocation = targetPlayer.getLocation().add(random.nextInt(1, 3), 1, random.nextInt(1, 3));
-                            targetPlayer.getLocation().getWorld().dropItem(dropLocation, newItemStack);
-                            if (coreProtectAPI != null) {
-                                PlayerDropItemListener.playerDropItem(dropLocation, targetPlayer.getName(), newItemStack);
+                        if (target.getLocation().getWorld() != null) {
+                            Location dropLocation = target.getLocation().add(random.nextInt(1, 3), 1, random.nextInt(1, 3));
+                            target.getLocation().getWorld().dropItem(dropLocation, newItemStack);
+                            CoreProtectAPI coreProtect = coreProtectApi();
+                            if (coreProtect != null) {
+                                try {
+                                    PlayerDropItemListener.playerDropItem(dropLocation, target.getName(), newItemStack);
+                                } catch (Throwable ignored) {
+                                    // CoreProtect logging is best-effort.
+                                }
                             }
                         }
-                        player.chat("Expelliarmus!");
+                        String disarmed = HammerCore.getInstance().getMessageManager().raw("admin.disarmed");
+                        if (disarmed != null) player.chat(disarmed);
                     }
                 }
-                return true;
             }
+            return true;
         }
-
         if (args[0].equals("sonic-boom") && args.length == 2) {
             Player player = Bukkit.getPlayer(args[1]);
             if (player != null) {
                 Snowball snowball = player.launchProjectile(Snowball.class);
                 snowball.setMetadata("hammercore", new FixedMetadataValue(HammerCore.getInstance(), "sonic-boom"));
-                snowball.setVelocity(player.getLocation().getDirection().normalize().multiply(2));
+                snowball.setVelocity(player.getLocation().getDirection().normalize().multiply(ConfigManager.SONIC_BOOM_VELOCITY));
                 new BukkitRunnable() {
-                    int num = 4;
-
-                    @Override
-                    public void run() {
-                        if (!snowball.isValid()) {
-                            cancel();
-                        }
+                    int num = ConfigManager.SONIC_BOOM_STEPS;
+                    @Override public void run() {
+                        if (!snowball.isValid()) { cancel(); return; }
                         Location location = snowball.getLocation();
                         if (location.getWorld() != null) {
-                            location.getWorld().spawnParticle(Particle.SONIC_BOOM, location, 3);
-                            location.getWorld().playSound(location, Sound.ENTITY_WARDEN_SONIC_BOOM, 1, 1);
+                            location.getWorld().spawnParticle(Particle.SONIC_BOOM, location, ConfigManager.SONIC_BOOM_PARTICLE_COUNT);
+                            location.getWorld().playSound(location, Sound.ENTITY_WARDEN_SONIC_BOOM, ConfigManager.SONIC_BOOM_SOUND_VOLUME, ConfigManager.SONIC_BOOM_SOUND_PITCH);
                         }
-                        if (num == 0) {
-                            snowball.remove();
-                            cancel();
-                        }
+                        if (num == 0) { snowball.remove(); cancel(); }
                         num--;
                     }
-                }.runTaskTimer(HammerCore.getInstance(), 0L, 5L);
-                return true;
+                }.runTaskTimer(HammerCore.getInstance(), 0L, ConfigManager.SONIC_BOOM_INTERVAL_TICKS);
             }
+            return true;
         }
-
         if (args[0].equals("give-levitation-effect") && args.length == 2) {
             Player player = Bukkit.getPlayer(args[1]);
             if (player != null) {
-                HammerUser hammerUser = HammerUser.getUser(player);
-                Player targetPlayer = hammerUser.getTargetPlayer();
-                if (targetPlayer != null) {
-                    targetPlayer.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, 60, 1));
-                    player.chat("Wingardium Leviosa!");
+                Player target = HammerUser.getUser(player).getTargetPlayer();
+                if (target != null) {
+                    target.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, ConfigManager.LEVITATION_DURATION_TICKS, ConfigManager.LEVITATION_AMPLIFIER));
+                    String levitated = HammerCore.getInstance().getMessageManager().raw("admin.levitated");
+                    if (levitated != null) player.chat(levitated);
                 }
-                return true;
             }
+            return true;
         }
-
         return true;
     }
 
@@ -146,14 +148,11 @@ public class AdminCommand extends BaseSubCommand {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            List<String> returnList = Arrays.asList(commandList);
+            List<String> returnList = new ArrayList<>(Arrays.asList(commandList));
             returnList.removeIf(s -> !s.startsWith(args[0]));
             return returnList;
         }
-        if (args[0].equals("talk") && args.length == 2) {
-            return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
-        }
-
+        if (args[0].equals("talk") && args.length == 2) return Bukkit.getOnlinePlayers().stream().map(Player::getName).toList();
         return Collections.singletonList("");
     }
 }

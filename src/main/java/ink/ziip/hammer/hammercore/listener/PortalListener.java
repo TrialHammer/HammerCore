@@ -13,8 +13,14 @@ public class PortalListener extends BaseListener {
         if (event.getReason() == PortalCreateEvent.CreateReason.FIRE ||
                 event.getReason() == PortalCreateEvent.CreateReason.NETHER_PAIR) {
             BlockState blockState = event.getBlocks().get(0);
-            BoundingBox boundingBox = new BoundingBox(-1000, -64, -1000, 1000, 320, 1000);
-            if (blockState.getWorld().getName().equals("world_nether") && !boundingBox.contains(blockState.getX(), blockState.getY(), blockState.getZ())) {
+            BoundingBox boundingBox = new BoundingBox(
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MIN_X,
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MIN_Y,
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MIN_Z,
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MAX_X,
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MAX_Y,
+                    ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_MAX_Z);
+            if (blockState.getWorld().getName().equals(ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PORTAL_NETHER_WORLD) && !boundingBox.contains(blockState.getX(), blockState.getY(), blockState.getZ())) {
                 event.setCancelled(true);
             }
         }

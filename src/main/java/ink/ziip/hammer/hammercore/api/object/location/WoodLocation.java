@@ -39,7 +39,7 @@ public class WoodLocation {
 
     public static void removeOutdatedWoods() {
         for (Map.Entry<WoodLocation, WoodLocation> entry : woodLocationMap.entrySet()) {
-            if (System.currentTimeMillis() - entry.getValue().strippedTime > 300000) {
+            if (System.currentTimeMillis() - entry.getValue().strippedTime > ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PEELING_RETENTION_MILLIS) {
                 woodLocationMap.remove(entry.getKey());
             }
         }

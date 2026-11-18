@@ -20,9 +20,16 @@ public class TaskManager extends BaseManager {
 
     @Override
     public void load() {
+        actionBarTask.setPeriod(ConfigManager.ACTION_BAR_REFRESH_TICKS);
         actionBarTask.start();
-        bossBarTask.start();
-        dataCleanerTask.start();
+        if (ConfigManager.INFO_BAR_ENABLED) {
+            bossBarTask.setPeriod(ConfigManager.INFO_BAR_REFRESH_TICKS);
+            bossBarTask.start();
+        }
+        if (ConfigManager.UTIL_PEELING_RECOVERY) {
+            dataCleanerTask.setPeriod(ConfigManager.UTIL_PEELING_CLEANUP_INTERVAL_TICKS);
+            dataCleanerTask.start();
+        }
     }
 
     @Override
@@ -34,6 +41,7 @@ public class TaskManager extends BaseManager {
 
     @Override
     public void reload() {
-
+        unload();
+        load();
     }
 }

@@ -8,7 +8,7 @@ public class DataCleanerTask extends BaseTask {
     private static DataCleanerTask instance;
 
     private DataCleanerTask() {
-        super(12000);
+        super(ink.ziip.hammer.hammercore.manager.ConfigManager.UTIL_PEELING_CLEANUP_INTERVAL_TICKS);
     }
 
     public static DataCleanerTask getInstance() {
@@ -27,6 +27,7 @@ public class DataCleanerTask extends BaseTask {
 
     @Override
     public void stop() {
-        cancel();
+        started = false;
+        cancelTask();
     }
 }

@@ -1,7 +1,7 @@
 name: HammerCore
-version: '${version}'
+version: '${project.version}'
 main: ink.ziip.hammer.hammercore.HammerCore
-api-version: '1.20'
+api-version: '26.3'
 authors: [ EterLzb ]
 description: Core plugin of TrialHammer.
 depend:
@@ -10,8 +10,7 @@ depend:
   - floodgate
 softdepend:
   - ProjectKorra
-  - Brewery
-  - Spartan
+  - BreweryX
   - CoreProtect
 commands:
   hammercore:
@@ -20,3 +19,18 @@ commands:
   menu:
     description: Opening menu command.
     usage: /<command>
+permissions:
+  hammercore.admin:
+    description: Grants all HammerCore administrative commands.
+    default: op
+    children:
+      hammercore.admin.talk: true
+      hammercore.admin.give-random-effect: true
+      hammercore.admin.give-levitation-effect: true
+      hammercore.admin.remove-main-hand: true
+      hammercore.admin.sonic-boom: true
+      hammercore.reload: true
+      hammercore.status: true
+      hammercore.ride: true
+      hammercore.say: true
+      hammercore.toggle: true

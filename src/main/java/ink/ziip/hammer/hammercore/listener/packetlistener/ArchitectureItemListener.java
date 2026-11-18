@@ -24,9 +24,8 @@ public class ArchitectureItemListener extends BasePacketListener {
         super();
         packetAdapter = new PacketAdapter(HammerCore.getInstance(), ListenerPriority.HIGH, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS) {
             public void onPacketSending(PacketEvent packetEvent) {
-                if (packetEvent.getPlayer().hasPermission("hammercore.utils.hidenbt")) {
-                    return;
-                }
+                if (!ConfigManager.UTIL_ARCHITECTURE_LORE_HIDDEN) return;
+                if (packetEvent.getPlayer().hasPermission(ConfigManager.UTIL_ARCHITECTURE_HIDE_PERMISSION)) return;
 
                 PacketContainer packetContainer = packetEvent.getPacket();
 

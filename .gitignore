@@ -235,3 +235,6 @@ gradle-app.setting
 *.hprof
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,linux,jetbrains+all,maven,gradle,java
+
+# Local plugin API jars for compilation are not committed (see README).
+/libs/

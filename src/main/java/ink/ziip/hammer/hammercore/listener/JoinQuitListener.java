@@ -17,7 +17,7 @@ public class JoinQuitListener extends BaseListener {
         // Remove invalid potion effects
         player.getActivePotionEffects().forEach(
                 potionEffect -> {
-                    if (potionEffect.getDuration() > 6000) {
+                    if (potionEffect.getDuration() > ink.ziip.hammer.hammercore.manager.ConfigManager.JOIN_REMOVE_EFFECTS_LONGER_THAN_TICKS) {
                         player.removePotionEffect(potionEffect.getType());
                     }
                 });

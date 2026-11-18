@@ -1,25 +1,31 @@
-# 头顶信息栏
+# HammerCore 1.4.0 for Paper 26.3
+# Every runtime switch/tunable is grouped here. Player-facing text lives in messages.yml.
+settings:
+  version: 5
+  enabled: true
+  debug: false
+
 info-bar:
   enabled: true
-  # 信息栏内容
+  refresh-ticks: 40
+  remove-on-quit: true
+  bar-color: WHITE
+  bar-style: SOLID
+  # Java-edition content. The first matching world entry wins; default is fallback.
   content:
-    # Java 版内容
     java:
-      # 默认内容
       default: "#BFCFD4&rꐐ"
-      # 对应世界内容
       world:
         - "world:#BFCFD4%hammercoreworld_java%&rꐐ%hammercoreseason_java%%hammercoreweather_java%"
         - "vanilla:#BFCFD4%hammercoreworld_java%&rꐐ"
         - "nether:#BFCFD4%hammercoreworld_java%&rꐐ"
         - "the_end:#BFCFD4%hammercoreworld_java%&rꐐ"
-    # 基岩版内容
     bedrock:
       default: "#BFCFD4%hammercoreworld_bedrock%"
       world:
         - "world:#BFCFD4%hammercoreworld_bedrock%&r %hammercoreseason_bedrock% %hammercoreweather_bedrock%"
         - "vanilla:#BFCFD4%hammercoreworld_bedrock%"
-  # 世界名
+  # Displayed world names.
   world-name:
     java:
       default: ""
@@ -39,7 +45,6 @@ info-bar:
         - "the_end:末地"
         - "spawn:主城"
         - "vanilla:香草"
-  # 替换内容
   info:
     season:
       default: ""
@@ -68,37 +73,48 @@ info-bar:
         - "雪天:&bꀋ&cꀕ"
         - "平静无风:"
 
-# 世界保护设置
+action-bar:
+  enabled: true
+  refresh-ticks: 40
+  idle-reset-millis: 1000
+  content: "\uE120\uE11E\uE116&f%pkaddons_actionbar% \uE121%rs_temperaturecolor%[ %rs_temperature% ]"
+
 world-protection:
-  # Only Creeper
   anti-explosion:
-    - world
-    - spawn
-    - void
+    enabled: true
+    only-creepers: true
+    worlds: [world, spawn, void]
   anti-griefing:
-    - world
-    - spawn
-    - void
+    enabled: true
+    worlds: [world, spawn, void]
+  invalid-chat-pattern: "[ꀀ-\uA48F]"
   no-cartographer: true
   prevent-farm-land-destroy: true
+  keep-inventory:
+    permission: "hammercore.utils.keepinventory"
+    minimum-y: -64
+    nether-maximum-y: 127
+    nether-worlds: [nether, world_nether]
+  protect-farm-permission: "hammercore.utils.protectfarm"
 
-# 基岩版设置
 floodgate:
-  # 隐藏粒子效果
   hide-particles: true
 
 util:
-  # 特供建材标签
   architecture-lore:
     hidden: true
+    hide-permission: "hammercore.utils.hidenbt"
     content:
       - "特供建材"
-  # 去皮右键复原
-  peeling-recovery: true
+  peeling-recovery:
+    enabled: true
+    retention-millis: 300000
+    cleanup-interval-ticks: 12000
   disable-join-message: true
   disable-quit-message: true
   auto-respawn:
     enabled: true
+    delay-ticks: 1
     location:
       world: "spawn"
       x: 309
@@ -106,14 +122,107 @@ util:
       z: 632.5
       yaw: 90
       pitch: -3
-  restrict-portal-range: false
+  disable-elytra: false
+  restrict-portal-range:
+    enabled: false
+    nether-world: "world_nether"
+    min-x: -1000
+    max-x: 1000
+    min-y: -64
+    max-y: 320
+    min-z: -1000
+    max-z: 1000
+  quick-actions:
+    swap-hand-opens-menu: true
+    drop-item-toggles-bending: true
+    clock-opens-menu: true
+    clock-material: CLOCK
+    menu-permission: "group.player"
+    menu-command: "dm open main_menu"
+    fallback-menu-command: "tutorial 5"
+    bend-toggle-command: "bend toggle"
+  spawn-litter:
+    enabled: true
+    world: "world"
+    min-x: 56
+    min-y: 22
+    min-z: 120
+    max-x: 103
+    max-y: 82
+    max-z: 217
+    cooldown-millis: 120000
+    cleanup-delay-ticks: 1200
+    cleanup-seconds: 120
+  souvenir:
+    enabled: true
+    map-material: FILLED_MAP
+    general-lore-pattern: "<[0-9]{4}-[0-9]{2}>"
+    ender-eye-enabled: true
+    workbench-lore-pattern: "\\[[0-9]{4}-[0-9]{2}]"
+    architecture-lore-pattern: ".*特供建材.*"
+    teleport-lore-pattern: "\\[[0-9]{3}-.*]"
+    warp-command: "huskhomes:warp %warp% %player%"
+
+join:
+  remove-effects-longer-than-ticks: 6000
+snowball:
+  enabled: true
+  velocity-multiplier: 2.0
+  damage: 3.0
+
+item-frame-lock:
+  enabled: true
+
 
 projectkorra:
   all-earth-binder: false
+  add-earth-delay-ticks: 20
+  add-earth-command: "bend add earth %player%"
 
-message:
-  no-permission: "&7[&c&l!&7] &4&l你没有权限。"
-  drinking-alcohol-is-bad-for-your-health: "&7[&c&l!&7] &4&l饮酒有害健康！未成年人不宜饮酒！"
-  meng-po-soup-tips: "&7[&c&l!&7] &b玩家&f%player_name%&b去奈何桥走了一遭。"
-  what-are-you-doing: "&7[&c&l!&7] &4&l你想要干什么！！！"
-  no-entity-was-targeted: "&7[&c&l!&7] &4&l你没有对准任何实体（或者距离太远）。"
+minecart:
+  enabled: true
+  remove-on-leave: true
+  accelerator:
+    enabled: true
+    rails-required: 5
+    boosted-max-speed: 2.4
+    normal-max-speed: 0.4
+    speed-cap: 2.0
+
+brewery:
+  quality-names:
+    premium-meng-po: "优质孟婆汤"
+    wine: "红酒"
+  commands:
+    meng-po-bend-remove: "bend remove %player%"
+    meng-po-warp: "warp 元素祭坛 %player%"
+    wine-reward: "si give 23中秋巡礼-风滚草镇 1 %player%"
+  wine-lore-pattern: ".*XL木桶熟成.*"
+
+integrations:
+  brewery:
+    enabled: true
+  projectkorra:
+    enabled: true
+  seasons:
+    enabled: true
+    world: "world"
+
+admin:
+  magic-stick:
+    cooldown-millis: 120000
+    uses: 10
+  target-threshold: 1.0
+  target-range: 50.0
+  random-effect-duration-ticks: 100
+  random-effect-amplifier: 1
+  levitation-duration-ticks: 60
+  levitation-amplifier: 1
+  sonic-boom:
+    velocity: 2.0
+    particle-count: 3
+    sound-volume: 1.0
+    sound-pitch: 1.0
+    interval-ticks: 5
+    steps: 4
+

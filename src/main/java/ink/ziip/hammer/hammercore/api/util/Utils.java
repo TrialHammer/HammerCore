@@ -29,19 +29,9 @@ public class Utils {
             PotionEffectType.GLOWING,
     };
 
-    private static final String[] badEffectsTranslation = new String[]{
-            "迟缓",
-            "凋零",
-            "虚弱",
-            "失明",
-            "饥饿",
-            "隐身",
-            "隐身",
-            "中毒",
-            "漂浮",
-            "漂浮",
-            "发光",
-            "发光",
+    private static final String[] badEffectKeys = new String[]{
+            "SLOWNESS", "WITHER", "WEAKNESS", "BLINDNESS", "HUNGER", "INVISIBILITY",
+            "INVISIBILITY", "POISON", "LEVITATION", "LEVITATION", "GLOWING", "GLOWING"
     };
 
     public static String translateColorCodes(String message) {
@@ -78,11 +68,14 @@ public class Utils {
     public List<Object> getRandomPotionEffect() {
         Random random = new Random();
         int num = random.nextInt(0, badEffects.length);
-        return Arrays.asList(badEffects[num], badEffectsTranslation[num]);
+        String display = ink.ziip.hammer.hammercore.HammerCore.getInstance().getMessageManager()
+                .raw("admin.effect-names." + badEffectKeys[num]);
+        if (display == null || display.isBlank()) display = badEffectKeys[num];
+        return Arrays.asList(badEffects[num], display);
     }
 
     public static boolean isTeleportationItem(String lore) {
-        String regex = "\\[[0-9]{3}-.*]";
+        String regex = ink.ziip.hammer.hammercore.manager.ConfigManager.SOUVENIR_TELEPORT_PATTERN;
         lore = ChatColor.stripColor(lore);
         return Pattern.matches(regex, lore);
     }

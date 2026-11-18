@@ -1,0 +1,40 @@
+# All player-facing text for HammerCore.
+# Keys are grouped by subsystem and may use PlaceholderAPI placeholders.
+command:
+  reload-success: "&aHammerCore 配置与语言文件已重新加载。"
+  reload-failed: "&c配置重载失败：%error%"
+  no-permission: "&7[&c&l!&7] &4&l你没有权限。"
+  what-are-you-doing: "&7[&c&l!&7] &4&l你想要干什么！！！"
+  no-entity-targeted: "&7[&c&l!&7] &4&l你没有对准任何实体（或者距离太远）。"
+  invalid-subcommand: "&7[&c&l!&7] &c未知子命令。"
+  status: "&6HammerCore %version% &7| 启用：%enabled% | 信息栏：%info_bar% | 动作栏：%action_bar%"
+  status-enabled: "&a是"
+  status-disabled: "&c否"
+admin:
+  effect-names:
+    SLOWNESS: "迟缓"
+    WITHER: "凋零"
+    WEAKNESS: "虚弱"
+    BLINDNESS: "失明"
+    HUNGER: "饥饿"
+    INVISIBILITY: "隐身"
+    POISON: "中毒"
+    LEVITATION: "漂浮"
+    GLOWING: "发光"
+  random-effect-target: "&b[!] &3你被 %player% 施加了诡异的%effect%"
+  random-effect-source: "&b[!] &3你对 %target% 施加了诡异的%effect%"
+  no-magic: "&b[!] &3你还没有足够的魔力。"
+  disarmed: "Expelliarmus!"
+  levitated: "Wingardium Leviosa!"
+brewery:
+  drinking-warning: "&7[&c&l!&7] &4&l饮酒有害健康！未成年人不宜饮酒！"
+  meng-po-soup: "&7[&c&l!&7] &b玩家&f%player_name%&b去奈何桥走了一遭。"
+item-frame:
+  locked-by-owner: "&7这个展示框的所有者为：%owner%"
+  now-owned: "&c你成为了这个展示框的所有者"
+  unlocked: "&c解除了展示框的锁定"
+quick-action:
+  void-warning: "&7[&c&l!&7] &6你脚下的方块下面是空气！"
+  litter-warning: "&d[拉菲] &7嗷呜～ %player% 在主城乱丢垃圾，拉菲将在 %seconds% 秒后把垃圾吃掉！"
+util:
+  invalid-characters: "&7[&c&l!&7] &4&l你不可以发送这些字符。"

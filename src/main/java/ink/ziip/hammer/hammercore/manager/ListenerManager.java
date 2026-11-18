@@ -4,75 +4,66 @@ import ink.ziip.hammer.hammercore.HammerCore;
 import ink.ziip.hammer.hammercore.api.listener.BaseListener;
 import ink.ziip.hammer.hammercore.api.manager.BaseManager;
 import ink.ziip.hammer.hammercore.listener.*;
-import ink.ziip.hammer.hammercore.listener.SnowballListener;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 
+/**
+ * Registers listeners based on switches and installed optional plugins.
+ * Optional-plugin listener classes are only referenced inside guards so their
+ * classes (and transitive plugin APIs) are never loaded when those plugins are absent.
+ */
 public class ListenerManager extends BaseManager {
-
-    private final BaseListener bossBarTaskListener;
-    private final BaseListener mineCartAcceleratorListener;
-    private final BaseListener protectionListener;
-    private final BaseListener breweryListener;
-    private final BaseListener peelingRecoveryListener;
-    private final BaseListener quickActionListener;
-    private final BaseListener joinQuitListener;
-    private final BaseListener snowBallListener;
-    private final BaseListener portalListener;
-    private final BaseListener itemFrameLockListener;
-
-    public ListenerManager() {
-        bossBarTaskListener = new BossBarTaskListener();
-        mineCartAcceleratorListener = new MineCartListener();
-        protectionListener = new ProtectionListener();
-        breweryListener = new BreweryListener();
-        peelingRecoveryListener = new PeelingRecoveryListener();
-        quickActionListener = new QuickActionListener();
-        joinQuitListener = new JoinQuitListener();
-        snowBallListener = new SnowballListener();
-        portalListener = new PortalListener();
-        itemFrameLockListener = new ItemFrameLockListener();
-    }
 
     @Override
     public void load() {
+        register(new JoinQuitListener());
 
-        joinQuitListener.register();
-        bossBarTaskListener.register();
-        mineCartAcceleratorListener.register();
-        protectionListener.register();
+        if (ConfigManager.INFO_BAR_ENABLED) {
+            register(new BossBarTaskListener());
+        }
+        if (ConfigManager.MINECART_ENABLED) {
+            register(new MineCartListener());
+        }
+
+        register(new ProtectionListener());
+
         if (ConfigManager.UTIL_RESTRICT_PORTAL_RANGE) {
-            portalListener.register();
+            register(new PortalListener());
         }
 
-        if (Bukkit.getPluginManager().getPlugin("Brewery") != null
+        if (ConfigManager.BREWERY_ENABLED
+                && Bukkit.getPluginManager().getPlugin("BreweryX") != null
                 && Bukkit.getPluginManager().getPlugin("ProjectKorra") != null) {
-            breweryListener.register();
-
-            if (ConfigManager.PROJECTKORRA_ALL_EARTH_BINDER) {
-                ProjectKorraListener projectKorraListener = new ProjectKorraListener();
-                projectKorraListener.register();
-            }
+            register(new BreweryListener());
         }
 
-        if (Bukkit.getPluginManager().getPlugin("Spartan") != null) {
-            SpartanListener spartanListener = new SpartanListener();
-            spartanListener.register();
+        if (ConfigManager.PROJECTKORRA_ENABLED
+                && Bukkit.getPluginManager().getPlugin("ProjectKorra") != null
+                && ConfigManager.PROJECTKORRA_ALL_EARTH_BINDER) {
+            register(new ProjectKorraListener());
         }
 
         if (ConfigManager.UTIL_PEELING_RECOVERY) {
-            peelingRecoveryListener.register();
+            register(new PeelingRecoveryListener());
         }
 
-        quickActionListener.register();
-        snowBallListener.register();
-        itemFrameLockListener.register();
-        if (Bukkit.getPluginManager().getPlugin("RealisticSeasons") != null) {
-            if (Bukkit.getPluginManager().getPlugin("Seasons") != null) {
-                SeasonListener seasonListener = new SeasonListener();
-                seasonListener.register();
-            }
+        register(new QuickActionListener());
+
+        if (ConfigManager.SNOWBALL_ENABLED) {
+            register(new SnowballListener());
         }
+        if (ConfigManager.ITEM_FRAME_LOCK_ENABLED) {
+            register(new ItemFrameLockListener());
+        }
+        if (ConfigManager.SEASONS_ENABLED
+                && Bukkit.getPluginManager().getPlugin("RealisticSeasons") != null
+                && Bukkit.getPluginManager().getPlugin("Seasons") != null) {
+            register(new SeasonListener());
+        }
+    }
+
+    private void register(BaseListener listener) {
+        listener.register();
     }
 
     @Override
@@ -82,6 +73,7 @@ public class ListenerManager extends BaseManager {
 
     @Override
     public void reload() {
-
+        unload();
+        load();
     }
 }

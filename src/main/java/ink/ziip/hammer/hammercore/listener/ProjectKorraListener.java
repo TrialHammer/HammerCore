@@ -24,9 +24,9 @@ public class ProjectKorraListener extends BaseListener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "bend add earth " + playerName);
+                        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), ink.ziip.hammer.hammercore.manager.ConfigManager.PROJECTKORRA_ADD_EARTH_COMMAND.replace("%player%", playerName));
                     }
-                }.runTaskLater(HammerCore.getInstance(), 20L);
+                }.runTaskLater(HammerCore.getInstance(), ink.ziip.hammer.hammercore.manager.ConfigManager.PROJECTKORRA_ADD_EARTH_DELAY_TICKS);
         }
     }
 }

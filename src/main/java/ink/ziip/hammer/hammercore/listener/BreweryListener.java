@@ -5,6 +5,7 @@ import com.dre.brewery.api.events.brew.BrewDrinkEvent;
 import com.dre.brewery.recipe.BRecipe;
 import ink.ziip.hammer.hammercore.api.listener.BaseListener;
 import ink.ziip.hammer.hammercore.api.object.user.HammerUser;
+import ink.ziip.hammer.hammercore.manager.ConfigManager;
 import ink.ziip.hammer.hammercore.manager.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -22,49 +23,46 @@ public class BreweryListener extends BaseListener {
     @EventHandler
     public void onPlayerBrew(BrewDrinkEvent event) {
         Player player = event.getPlayer();
-        if (player == null)
-            return;
+        if (player == null) return;
         HammerUser hammerUser = HammerUser.getUser(player);
         hammerUser.sendMessage(MessageManager.DRINKING_ALCOHOL_IS_BAD_FOR_YOUR_HEALTH);
-        BRecipe bRecipe = event.getBrew().getCurrentRecipe();
+        BRecipe recipe = event.getBrew().getCurrentRecipe();
+        if (recipe == null) return;
 
-        if (bRecipe == null)
-            return;
-
-        if (bRecipe.getName(event.getBrew().getQuality()).equals("优质孟婆汤")) {
-            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "bend remove " + player.getName());
-            Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "warp 元素祭坛 " + player.getName());
+        String qualityName = recipe.getName(event.getBrew().getQuality());
+        if (qualityName.equals(ConfigManager.BREWERY_PREMIUM_MENG_PO_RECIPE)) {
+            runConsole(ConfigManager.BREWERY_MENG_PO_BEND_REMOVE_COMMAND, player);
+            runConsole(ConfigManager.BREWERY_MENG_PO_WARP_COMMAND, player);
             Bukkit.broadcastMessage(hammerUser.setPlaceholders(MessageManager.MENG_PO_SOUP_TIPS));
             return;
         }
 
-        if (bRecipe.getName(event.getBrew().getQuality()).equals("红酒")) {
-            if (event.getItemMeta().hasLore()) {
-                for (String lore : event.getItemMeta().getLore()) {
-                    String regex = ".*XL木桶熟成.*";
-                    if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
-                        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(), "si give 23中秋巡礼-风滚草镇 1 " + player.getName());
-                        return;
-                    }
+        if (qualityName.equals(ConfigManager.BREWERY_WINE_RECIPE) && event.getItemMeta().hasLore()) {
+            for (String lore : event.getItemMeta().getLore()) {
+                if (Pattern.matches(ConfigManager.BREWERY_WINE_LORE_PATTERN, ChatColor.stripColor(lore))) {
+                    runConsole(ConfigManager.BREWERY_WINE_REWARD_COMMAND, player);
+                    return;
                 }
             }
         }
     }
 
+    private void runConsole(String template, Player player) {
+        Bukkit.getServer().dispatchCommand(Bukkit.getServer().getConsoleSender(),
+                template.replace("%player%", player.getName()));
+    }
+
     @EventHandler
-    public void PlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getClickedBlock() != null && (event.getClickedBlock().getType() == Material.CAULDRON
-                    || event.getClickedBlock().getType() == Material.WATER_CAULDRON)) {
-                if (event.getItem() != null && event.getItem().getType() == Material.POTION) {
-                    if (BreweryApi.isBrew(event.getItem())) {
-                        event.setCancelled(true);
-                        event.getItem().setType(Material.GLASS_BOTTLE);
-                        ItemStack itemStack = new ItemStack(Material.GLASS_BOTTLE);
-                        event.getItem().setItemMeta(itemStack.getItemMeta());
-                    }
-                }
-            }
-        }
+    public void onPlayerInteract(PlayerInteractEvent event) {
+        if (event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getClickedBlock() == null) return;
+        if (event.getClickedBlock().getType() != Material.CAULDRON
+                && event.getClickedBlock().getType() != Material.WATER_CAULDRON) return;
+        if (event.getItem() == null || event.getItem().getType() != Material.POTION) return;
+        if (!BreweryApi.isBrew(event.getItem())) return;
+
+        event.setCancelled(true);
+        event.getItem().setType(Material.GLASS_BOTTLE);
+        ItemStack itemStack = new ItemStack(Material.GLASS_BOTTLE);
+        event.getItem().setItemMeta(itemStack.getItemMeta());
     }
 }

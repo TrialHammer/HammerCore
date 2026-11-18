@@ -23,7 +23,7 @@ public class MineCartListener extends BaseListener {
         Entity entity = event.getEntity();
         if (entity instanceof Player && dismounted instanceof Minecart minecart && minecart.getPassengers().size() == 1) {
             HammerUser hammerUser = HammerUser.getUser(entity);
-            if (hammerUser.isRemoveMineCartOnLeaving()) {
+            if (hammerUser.isRemoveMineCartOnLeaving() && ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_REMOVE_ON_LEAVE) {
                 minecart.remove();
                 entity.teleport(entity.getLocation().add(0, 1, 0));
                 entity.getWorld().dropItem(entity.getLocation(), new ItemStack(Material.MINECART));
@@ -46,31 +46,29 @@ public class MineCartListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onVehicleMove(VehicleMoveEvent event) {
+        if (!ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_ACCELERATOR_ENABLED) return;
         if (event.getVehicle() instanceof Minecart cart && !event.getVehicle().isEmpty()) {
 
             for (Entity entity : event.getVehicle().getPassengers()) {
                 if (entity instanceof LivingEntity) {
-                    Location frontLocation1 = event.getFrom().add(cart.getFacing().getDirection().multiply(1));
-                    Location frontLocation2 = event.getFrom().add(cart.getFacing().getDirection().multiply(2));
-                    Location frontLocation3 = event.getFrom().add(cart.getFacing().getDirection().multiply(3));
-                    Location frontLocation4 = event.getFrom().add(cart.getFacing().getDirection().multiply(4));
-                    Location frontLocation5 = event.getFrom().add(cart.getFacing().getDirection().multiply(5));
-                    if (frontLocation1.getBlock().getType() == Material.POWERED_RAIL &&
-                            frontLocation2.getBlock().getType() == Material.POWERED_RAIL &&
-                            frontLocation3.getBlock().getType() == Material.POWERED_RAIL &&
-                            frontLocation4.getBlock().getType() == Material.POWERED_RAIL &&
-                            frontLocation5.getBlock().getType() == Material.POWERED_RAIL &&
-                            frontLocation1.getBlock().getType() != Material.RAIL &&
-                            cart.getLocation().getBlock().getType() != Material.RAIL &&
-                            event.getFrom().getBlock().getType() != Material.RAIL &&
-                            event.getTo().getBlock().getType() != Material.RAIL
-                    ) {
-                        cart.setMaxSpeed(2.4);
-                    } else {
-                        if (cart.getVelocity().length() > 2) {
-                            cart.setVelocity(cart.getVelocity().multiply(2 / cart.getVelocity().length()));
+                    int required = ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_ACCELERATOR_RAILS_REQUIRED;
+                    boolean boosted = true;
+                    for (int i = 1; i <= required; i++) {
+                        if (event.getFrom().add(cart.getFacing().getDirection().multiply(i)).getBlock().getType() != Material.POWERED_RAIL) {
+                            boosted = false;
+                            break;
                         }
-                        cart.setMaxSpeed(0.4);
+                    }
+                    if (boosted && cart.getLocation().getBlock().getType() != Material.RAIL
+                            && event.getFrom().getBlock().getType() != Material.RAIL
+                            && event.getTo().getBlock().getType() != Material.RAIL) {
+                        cart.setMaxSpeed(ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_BOOSTED_MAX_SPEED);
+                    } else {
+                        double cap = ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_SPEED_CAP;
+                        if (cart.getVelocity().length() > cap) {
+                            cart.setVelocity(cart.getVelocity().multiply(cap / cart.getVelocity().length()));
+                        }
+                        cart.setMaxSpeed(ink.ziip.hammer.hammercore.manager.ConfigManager.MINECART_NORMAL_MAX_SPEED);
                     }
                     return;
                 }

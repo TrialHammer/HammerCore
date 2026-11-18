@@ -38,18 +38,17 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onCreeperExplode(EntityExplodeEvent event) {
+        if (!ConfigManager.WORLD_PROTECTION_ANTI_EXPLOSION_ENABLED) return;
         World world = event.getLocation().getWorld();
-        if (world == null)
-            return;
-        if (ConfigManager.WORLD_PROTECTION_ANTI_EXPLOSION_WORLD_LIST.contains(world.getName())) {
-            if (event.getEntity() instanceof Creeper) {
-                event.blockList().clear();
-            }
+        if (world == null || !ConfigManager.WORLD_PROTECTION_ANTI_EXPLOSION_WORLD_LIST.contains(world.getName())) return;
+        if (!ConfigManager.WORLD_PROTECTION_ANTI_EXPLOSION_ONLY_CREEPERS || event.getEntity() instanceof Creeper) {
+            event.blockList().clear();
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onEntityChangeBlock(EntityChangeBlockEvent event) {
+        if (!ConfigManager.WORLD_PROTECTION_ANTI_GRIEFING_ENABLED) return;
         World world = event.getBlock().getWorld();
         if (!(event.getEntity() instanceof Enderman))
             return;
@@ -80,7 +79,7 @@ public class ProtectionListener extends BaseListener {
             if (block == null)
                 return;
             if (block.getType() == Material.FARMLAND) {
-                if (event.getPlayer().hasPermission("hammercore.utils.protectfarm")) {
+                if (event.getPlayer().hasPermission(ConfigManager.WORLD_PROTECTION_PROTECT_FARM_PERMISSION)) {
                     event.setCancelled(true);
                 }
             }
@@ -90,20 +89,21 @@ public class ProtectionListener extends BaseListener {
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerSendInvalidChars(AsyncPlayerChatEvent event) {
         Player player = event.getPlayer();
-        String pattern = "[ꀀ-\uA48F]";
+        String pattern = ConfigManager.WORLD_PROTECTION_INVALID_CHAT_PATTERN;
 
         if (Pattern.matches(pattern, event.getMessage())) {
             event.setCancelled(true);
-            player.sendMessage(Utils.translateColorCodes(MessageManager.NO_PERMISSION));
+            player.sendMessage(MessageManager.INVALID_CHARACTERS);
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
-        if (player.hasPermission("hammercore.utils.keepinventory") || player.getLocation().getY() < -64
-                || (player.getLocation().getWorld() != null && player.getLocation().getWorld().getName().equals("nether")
-                && player.getLocation().getY() >= 127)) {
+        if (player.hasPermission(ConfigManager.WORLD_PROTECTION_KEEP_INVENTORY_PERMISSION) || player.getLocation().getY() < ConfigManager.WORLD_PROTECTION_KEEP_INVENTORY_MIN_Y
+                || (player.getLocation().getWorld() != null
+                && ConfigManager.WORLD_PROTECTION_KEEP_INVENTORY_NETHER_WORLDS.contains(player.getLocation().getWorld().getName())
+                && player.getLocation().getY() >= ConfigManager.WORLD_PROTECTION_KEEP_INVENTORY_NETHER_MAX_Y)) {
             event.getDrops().clear();
             event.setDroppedExp(0);
             event.setKeepInventory(true);
@@ -113,6 +113,7 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onUsingSouvenir(PlayerInteractEvent event) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
         if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
 
@@ -120,7 +121,8 @@ public class ProtectionListener extends BaseListener {
         if (itemStack == null)
             return;
 
-        if (itemStack.getType() != Material.MAP && itemStack.getType() != Material.ENDER_EYE)
+        if (itemStack.getType() != ConfigManager.SOUVENIR_MAP_MATERIAL
+                && (!ConfigManager.SOUVENIR_ENDER_EYE_ENABLED || itemStack.getType() != Material.ENDER_EYE))
             return;
 
         ItemMeta itemMeta = itemStack.getItemMeta();
@@ -131,7 +133,7 @@ public class ProtectionListener extends BaseListener {
             return;
 
         itemMeta.getLore().forEach(content -> {
-            boolean isSouvenir = Pattern.matches("<[0-9]{4}-[0-9]{2}>", ChatColor.stripColor(content));
+            boolean isSouvenir = Pattern.matches(ConfigManager.SOUVENIR_GENERAL_PATTERN, ChatColor.stripColor(content));
             if (isSouvenir) {
                 event.setCancelled(true);
             }
@@ -140,12 +142,13 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onUsingCartographyToCopyMap(PrepareItemCraftEvent event) {
-        if (event.getInventory().getResult() != null && event.getInventory().getResult().getType() == Material.FILLED_MAP) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
+        if (event.getInventory().getResult() != null && event.getInventory().getResult().getType() == ConfigManager.SOUVENIR_MAP_MATERIAL) {
             ItemMeta itemMeta = event.getInventory().getResult().getItemMeta();
             if (itemMeta != null) {
                 if (itemMeta.hasLore()) {
                     for (String lore : itemMeta.getLore()) {
-                        String regex = "\\[[0-9]{4}-[0-9]{2}]";
+                        String regex = ConfigManager.SOUVENIR_WORKBENCH_PATTERN;
                         if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
                             event.getInventory().setResult(new ItemStack(Material.AIR));
                         }
@@ -157,15 +160,16 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onUsingWorkbenchToCopyMap(InventoryClickEvent event) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
         ItemStack itemStack = event.getCurrentItem();
         if (event.getClickedInventory() != null) {
             if (event.getSlotType() == InventoryType.SlotType.RESULT && itemStack != null && event.getClickedInventory().getType() == InventoryType.WORKBENCH) {
-                if (itemStack.getType() == Material.FILLED_MAP) {
+                if (itemStack.getType() == ConfigManager.SOUVENIR_MAP_MATERIAL) {
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     if (itemMeta != null) {
                         if (itemMeta.hasLore()) {
                             for (String lore : itemMeta.getLore()) {
-                                String regex = "\\[[0-9]{4}-[0-9]{2}]";
+                                String regex = ConfigManager.SOUVENIR_WORKBENCH_PATTERN;
                                 if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
                                     event.setCancelled(true);
                                 }
@@ -179,14 +183,16 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onUsingWorkbenchForCustomItems(InventoryClickEvent event) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
         if (event.getClickedInventory() != null) {
             if (event.getClickedInventory().getType() == InventoryType.WORKBENCH) {
                 for (ItemStack itemStack : event.getClickedInventory().getContents()) {
+                    if (itemStack == null) continue;
                     ItemMeta itemMeta = itemStack.getItemMeta();
                     if (itemMeta != null) {
                         if (itemMeta.hasLore()) {
                             for (String lore : itemMeta.getLore()) {
-                                String regex = "\\[[0-9]{4}-[0-9]{2}]";
+                                String regex = ConfigManager.SOUVENIR_WORKBENCH_PATTERN;
                                 if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
                                     event.setCancelled(true);
                                 }
@@ -200,6 +206,7 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onUsingWorkbenchForArchitectureItem(InventoryClickEvent event) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
         ItemStack itemStack = event.getCurrentItem();
         if (event.getClickedInventory() != null) {
             if (event.getSlotType() == InventoryType.SlotType.RESULT && itemStack != null && event.getInventory().getType() != InventoryType.MERCHANT) {
@@ -207,7 +214,7 @@ public class ProtectionListener extends BaseListener {
                 if (itemMeta != null) {
                     if (itemMeta.hasLore()) {
                         for (String lore : itemMeta.getLore()) {
-                            String regex = ".*特供建材.*";
+                            String regex = ConfigManager.SOUVENIR_ARCHITECTURE_PATTERN;
                             if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
                                 event.setCancelled(true);
                             }
@@ -220,6 +227,7 @@ public class ProtectionListener extends BaseListener {
 
     @EventHandler(priority = EventPriority.LOWEST)
     public void onMovingArchitectureItemIntoAnother(InventoryClickEvent event) {
+        if (!ConfigManager.SOUVENIR_ENABLED) return;
         Inventory top = event.getView().getTopInventory();
         Inventory bottom = event.getView().getBottomInventory();
 
@@ -235,7 +243,7 @@ public class ProtectionListener extends BaseListener {
                 if (itemMeta != null) {
                     if (itemMeta.hasLore()) {
                         for (String lore : itemMeta.getLore()) {
-                            String regex = ".*特供建材.*";
+                            String regex = ConfigManager.SOUVENIR_ARCHITECTURE_PATTERN;
                             if (Pattern.matches(regex, ChatColor.stripColor(lore))) {
                                 event.setCancelled(true);
                             }

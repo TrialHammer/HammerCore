@@ -16,7 +16,8 @@ public class ParticleListener extends BasePacketListener {
         super();
         packetAdapter = new PacketAdapter(HammerCore.getInstance(), ListenerPriority.HIGH, PacketType.Play.Server.WORLD_PARTICLES) {
             public void onPacketSending(PacketEvent packetEvent) {
-                if (HammerUser.getUser(packetEvent.getPlayer()).isBedrockPlayer()) {
+                if (ink.ziip.hammer.hammercore.manager.ConfigManager.FLOODGATE_HIDE_PARTICLES
+                        && HammerUser.getUser(packetEvent.getPlayer()).isBedrockPlayer()) {
                     packetEvent.setCancelled(true);
                 }
             }

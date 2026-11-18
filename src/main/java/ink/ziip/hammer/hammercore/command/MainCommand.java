@@ -39,6 +39,8 @@ public class MainCommand implements CommandExecutor, TabCompleter {
             return subCommand.onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length));
         }
 
+        sender.sendMessage(ink.ziip.hammer.hammercore.HammerCore.getInstance().getMessageManager()
+                .text("command.invalid-subcommand"));
         return true;
     }
 

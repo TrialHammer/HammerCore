@@ -23,66 +23,103 @@ public final class HammerCore extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
-
         saveDefaultConfig();
 
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") == null) {
-            /*
-             * We inform about the fact that PlaceholderAPI isn't installed and then
-             * disable this plugin to prevent issues.
-             */
-            getLogger().warning("Could not find PlaceholderAPI!");
+            getLogger().warning("Could not find PlaceholderAPI; disabling HammerCore.");
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
-        // Configuration loading
+        // Configuration and messages are always loaded so /hammercore reload can recover a disabled plugin.
         configManager = new ConfigManager();
         configManager.load();
-
-        // Messages loading
         messageManager = new MessageManager();
         messageManager.load();
 
-        // Placeholders loading
-        placeholderExpansionManager = new PlaceholderExpansionManager();
-        placeholderExpansionManager.load();
-
-        // Commands loading
         commandManager = new CommandManager();
         commandManager.load();
 
-        // Packet listeners loading
+        if (!Boolean.TRUE.equals(ConfigManager.SETTINGS_ENABLED)) {
+            getLogger().info("HammerCore features are disabled via settings.enabled; use /hammercore reload after enabling.");
+            return;
+        }
+
+        placeholderExpansionManager = new PlaceholderExpansionManager();
+        placeholderExpansionManager.load();
+
         packetListenerManager = new PacketListenerManager();
         packetListenerManager.load();
 
-        // Tasks loading
         taskManager = new TaskManager();
         taskManager.load();
 
-        // Listeners loading
         listenerManager = new ListenerManager();
         listenerManager.load();
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        if (listenerManager != null) listenerManager.unload();
+        if (taskManager != null) taskManager.unload();
+        if (packetListenerManager != null) packetListenerManager.unload();
+        if (placeholderExpansionManager != null) placeholderExpansionManager.unload();
+        if (commandManager != null) commandManager.unload();
+        if (messageManager != null) messageManager.unload();
+        if (configManager != null) configManager.unload();
 
-        configManager.unload();
-        messageManager.unload();
-        commandManager.unload();
-        packetListenerManager.unload();
-        placeholderExpansionManager.unload();
-        taskManager.unload();
-        listenerManager.unload();
-
-        // Clean cache
         HammerUser.cleanHammerUsers();
         WoodLocation.cleanWoods();
     }
 
     public static HammerCore getInstance() {
         return instance;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    /** Reloads YAML, messages, permissions and re-registers listeners and tasks. */
+    public void reloadRuntimeConfiguration() {
+        configManager.reload();
+        messageManager.reload();
+
+        if (!Boolean.TRUE.equals(ConfigManager.SETTINGS_ENABLED)) {
+            if (listenerManager != null) {
+                listenerManager.unload();
+                listenerManager = null;
+            }
+            if (taskManager != null) {
+                taskManager.unload();
+                taskManager = null;
+            }
+            getLogger().info("HammerCore features are disabled via settings.enabled.");
+            return;
+        }
+
+        if (placeholderExpansionManager == null) {
+            placeholderExpansionManager = new PlaceholderExpansionManager();
+            placeholderExpansionManager.load();
+        }
+        if (packetListenerManager == null) {
+            packetListenerManager = new PacketListenerManager();
+            packetListenerManager.load();
+        }
+        if (taskManager == null) {
+            taskManager = new TaskManager();
+        }
+        taskManager.reload();
+        if (listenerManager == null) {
+            listenerManager = new ListenerManager();
+        }
+        listenerManager.reload();
+        if (ConfigManager.SETTINGS_DEBUG) {
+            getLogger().info("Reloaded HammerCore configuration and messages.");
+        }
     }
 }
