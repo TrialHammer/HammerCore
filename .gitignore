@@ -238,3 +238,6 @@ gradle-app.setting
 
 # Local plugin API jars for compilation are not committed (see README).
 /libs/
+
+# Generated release artifacts
+dist/

@@ -6,16 +6,18 @@
 
     <groupId>ink.ziip.hammer</groupId>
     <artifactId>HammerCore</artifactId>
-    <version>1.4.0-26.3</version>
+    <version>1.4.0</version>
     <packaging>jar</packaging>
 
     <name>HammerCore</name>
-    <description>Core plugin of TrialHammer for Paper 26.3.</description>
+    <description>Core plugin of TrialHammer for Paper 26.3 and 1.21.x.</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>21</maven.compiler.release>
-        <spigot.version>26.3-R0.1-SNAPSHOT</spigot.version>
+        <paper.version>26.3</paper.version>
+        <paper.api-version>26.3</paper.api-version>
+        <spigot.version>${paper.version}-R0.1-SNAPSHOT</spigot.version>
         <floodgate.version>2.2.5-SNAPSHOT</floodgate.version>
         <placeholderapi.version>2.12.3</placeholderapi.version>
         <protocollib.version>5.3.0</protocollib.version>
@@ -128,7 +130,7 @@
     </dependencies>
 
     <build>
-        <finalName>HammerCore-${project.version}</finalName>
+        <finalName>HammerCore-${project.version}-${paper.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>

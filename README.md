@@ -5,7 +5,7 @@ HammerCore 是 TrialHammer 服务器的核心插件，整合头顶信息栏、�
 
 ## 环境
 
-- Paper 26.3（`paper-api`/`spigot-api 26.3`）
+- Paper 26.3 或 Paper 1.21.11（兼容整个 Paper 1.21.x 系列）
 - Java 21+
 - 运行依赖：ProtocolLib、PlaceholderAPI、floodgate
 - 可选集成：ProjectKorra 1.12、BreweryX 3.7.1、CoreProtect
@@ -13,10 +13,13 @@ HammerCore 是 TrialHammer 服务器的核心插件，整合头顶信息栏、�
 ## 构建
 
 ```bash
-mvn clean package
+bash scripts/build.sh                     # Paper 26.3，默认
+PAPER_API_VERSION=1.21.11 bash scripts/build.sh
 ```
 
-产物：`target/HammerCore-1.4.0-26.3.jar`。
+产物写入 `dist/HammerCore-1.4.0-<Paper版本>.jar`。1.21.x 产物声明
+`api-version: 1.21`，可通用于 1.21.1 至 1.21.11；26.3 产物声明
+`api-version: 26.3`。直接执行 `mvn clean package` 仍会构建默认的 Paper 26.3 版本。
 
 `libs/` 中的本地 jar 不纳入版本控制，编译前需自行放入：
 

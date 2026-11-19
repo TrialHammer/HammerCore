@@ -1,7 +1,7 @@
 name: HammerCore
-version: '${project.version}'
+version: '${project.version}-${paper.version}'
 main: ink.ziip.hammer.hammercore.HammerCore
-api-version: '26.3'
+api-version: '${paper.api-version}'
 authors: [ EterLzb ]
 description: Core plugin of TrialHammer.
 depend:
