@@ -139,7 +139,6 @@ public class ConfigManager extends BaseManager {
     public static boolean SNOWBALL_ENABLED;
     public static double SNOWBALL_VELOCITY_MULTIPLIER;
     public static double SNOWBALL_DAMAGE;
-    public static boolean ITEM_FRAME_LOCK_ENABLED;
 
     public ConfigManager() {
         config = HammerCore.getInstance().getConfig();
@@ -285,7 +284,6 @@ public class ConfigManager extends BaseManager {
         SNOWBALL_ENABLED = config.getBoolean("snowball.enabled", true);
         SNOWBALL_VELOCITY_MULTIPLIER = config.getDouble("snowball.velocity-multiplier", 2.0D);
         SNOWBALL_DAMAGE = config.getDouble("snowball.damage", 3.0D);
-        ITEM_FRAME_LOCK_ENABLED = config.getBoolean("item-frame-lock.enabled", true);
 
         World world = Bukkit.getWorld(Objects.requireNonNull(config.getString("util.auto-respawn.location.world")));
         UTIL_AUTO_RESPAWN_LOCATION = new Location(world,
@@ -345,14 +343,21 @@ public class ConfigManager extends BaseManager {
             changed = true;
         }
 
+        // v6: item-frame locking moved to CodFrame, which also imports the legacy
+        // hammercore:owneruuid / hammercore:ownerusername frame data on load.
+        if (config.contains("item-frame-lock")) {
+            config.set("item-frame-lock", null);
+            changed = true;
+        }
+
         // v5: player-visible messages moved from config.yml#message into messages.yml.
         if (MessageManager.migrateLegacyMessages(config)) {
             changed = true;
         }
 
         int version = config.getInt("settings.version", 0);
-        if (version < 5) {
-            config.set("settings.version", 5);
+        if (version < 6) {
+            config.set("settings.version", 6);
             changed = true;
         }
 

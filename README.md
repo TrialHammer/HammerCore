@@ -1,7 +1,7 @@
 # HammerCore
 
 HammerCore 是 TrialHammer 服务器的核心插件，整合头顶信息栏、世界保护、快捷操作、
-展示框锁定、矿车加速、酿造扩展、ProjectKorra 联动与 PlaceholderAPI 变量。
+矿车加速、酿造扩展、ProjectKorra 联动与 PlaceholderAPI 变量。
 
 ## 环境
 
@@ -37,6 +37,10 @@ mvn clean package
 - `util.*`：去皮恢复、自动重生、快捷菜单、主城掉落清理、纪念品传送。
 - `projectkorra.*`、`brewery.*`、`minecart.*`、`integrations.*`：各联动功能。
 - `messages.yml`：所有命令、提示、警告和广播文本。
+
+> 展示框保护已迁移到 [CodFrame](https://modrinth.com/plugin/codframe)，由 CodFrame 自动导入
+> HammerCore 旧版的 `hammercore:owneruuid` / `ownerusername` 数据；HammerCore 的
+> `item-frame-lock` 配置项会在升级时自动移除。
 
 `/hammercore reload` 可重载 YAML 并重新注册监听器。
 

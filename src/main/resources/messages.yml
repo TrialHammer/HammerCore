@@ -29,10 +29,6 @@ admin:
 brewery:
   drinking-warning: "&7[&c&l!&7] &4&l饮酒有害健康！未成年人不宜饮酒！"
   meng-po-soup: "&7[&c&l!&7] &b玩家&f%player_name%&b去奈何桥走了一遭。"
-item-frame:
-  locked-by-owner: "&7这个展示框的所有者为：%owner%"
-  now-owned: "&c你成为了这个展示框的所有者"
-  unlocked: "&c解除了展示框的锁定"
 quick-action:
   void-warning: "&7[&c&l!&7] &6你脚下的方块下面是空气！"
   litter-warning: "&d[拉菲] &7嗷呜～ %player% 在主城乱丢垃圾，拉菲将在 %seconds% 秒后把垃圾吃掉！"

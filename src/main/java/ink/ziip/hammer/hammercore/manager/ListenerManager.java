@@ -52,9 +52,6 @@ public class ListenerManager extends BaseManager {
         if (ConfigManager.SNOWBALL_ENABLED) {
             register(new SnowballListener());
         }
-        if (ConfigManager.ITEM_FRAME_LOCK_ENABLED) {
-            register(new ItemFrameLockListener());
-        }
         if (ConfigManager.SEASONS_ENABLED
                 && Bukkit.getPluginManager().getPlugin("RealisticSeasons") != null
                 && Bukkit.getPluginManager().getPlugin("Seasons") != null) {

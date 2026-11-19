@@ -1,7 +1,7 @@
 # HammerCore 1.4.0 for Paper 26.3
 # Every runtime switch/tunable is grouped here. Player-facing text lives in messages.yml.
 settings:
-  version: 5
+  version: 6
   enabled: true
   debug: false
 
@@ -169,9 +169,6 @@ snowball:
   enabled: true
   velocity-multiplier: 2.0
   damage: 3.0
-
-item-frame-lock:
-  enabled: true
 
 
 projectkorra:
