@@ -1,7 +1,7 @@
 # HammerCore 1.4.0 for Paper 26.3
 # Every runtime switch/tunable is grouped here. Player-facing text lives in messages.yml.
 settings:
-  version: 6
+  version: 7
   enabled: true
   debug: false
 
@@ -169,6 +169,18 @@ snowball:
   enabled: true
   velocity-multiplier: 2.0
   damage: 3.0
+
+# Anti raid farm: a player may start a raid only once per cooldown.
+anti-raid-farm:
+  enabled: true
+  cooldown-seconds: 180
+  bypass-permission: "hammercore.antiraidfarm.bypass"
+
+# Ported from AntiVillagerLag: /hammercore restorevillagers [radius] restores
+# optimised villagers (AI + name) back to their original state.
+villager-restore:
+  default-radius: 50
+  max-radius: 50
 
 
 projectkorra:

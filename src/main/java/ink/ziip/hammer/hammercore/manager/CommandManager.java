@@ -8,6 +8,7 @@ import ink.ziip.hammer.hammercore.command.sub.AdminCommand;
 import ink.ziip.hammer.hammercore.command.sub.RideCommand;
 import ink.ziip.hammer.hammercore.command.sub.SayCommand;
 import ink.ziip.hammer.hammercore.command.sub.ToggleCommand;
+import ink.ziip.hammer.hammercore.command.sub.RestoreVillagersCommand;
 import ink.ziip.hammer.hammercore.command.sub.ReloadSubCommand;
 import ink.ziip.hammer.hammercore.command.sub.StatusSubCommand;
 import org.bukkit.Bukkit;
@@ -42,6 +43,7 @@ public class CommandManager extends BaseManager {
         this.mainCommand.addSubCommand(new RideCommand());
         this.mainCommand.addSubCommand(new SayCommand());
         this.mainCommand.addSubCommand(new ToggleCommand());
+        this.mainCommand.addSubCommand(new RestoreVillagersCommand());
         this.mainCommand.addSubCommand(new ReloadSubCommand());
         this.mainCommand.addSubCommand(new StatusSubCommand());
 

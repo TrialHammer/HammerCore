@@ -34,3 +34,9 @@ quick-action:
   litter-warning: "&d[拉菲] &7嗷呜～ %player% 在主城乱丢垃圾，拉菲将在 %seconds% 秒后把垃圾吃掉！"
 util:
   invalid-characters: "&7[&c&l!&7] &4&l你不可以发送这些字符。"
+villager:
+  only-player: "&7[&c&l!&7] &c该命令只能由玩家执行。"
+  radius-invalid: "&7[&c&l!&7] &c半径必须是有效的整数。"
+  radius-limit: "&7[&c&l!&7] &c半径超出上限，最大为 %radius% 格。"
+  searching: "&a正在搜索半径 %radius% 格内的村民……"
+  restored: "&a已恢复 %count% 只村民的原始状态。"

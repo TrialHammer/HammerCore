@@ -52,6 +52,9 @@ public class ListenerManager extends BaseManager {
         if (ConfigManager.SNOWBALL_ENABLED) {
             register(new SnowballListener());
         }
+        if (ConfigManager.ANTI_RAID_FARM_ENABLED) {
+            register(new AntiRaidFarmListener());
+        }
         if (ConfigManager.SEASONS_ENABLED
                 && Bukkit.getPluginManager().getPlugin("RealisticSeasons") != null
                 && Bukkit.getPluginManager().getPlugin("Seasons") != null) {

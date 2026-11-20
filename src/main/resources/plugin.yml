@@ -34,3 +34,9 @@ permissions:
       hammercore.ride: true
       hammercore.say: true
       hammercore.toggle: true
+  hammercore.restorevillagers:
+    description: Restores optimised villagers to their original state.
+    default: true
+  hammercore.antiraidfarm.bypass:
+    description: Bypass the anti raid farm cooldown.
+    default: op

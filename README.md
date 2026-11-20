@@ -38,6 +38,9 @@ PAPER_API_VERSION=1.21.11 bash scripts/build.sh
 - `info-bar.*` / `action-bar.*`：信息栏显示、刷新周期与内容。
 - `world-protection.*`：爆炸、实体破坏、耕地保护、保留物品、传送门边界。
 - `util.*`：去皮恢复、自动重生、快捷菜单、主城掉落清理、纪念品传送。
+- `anti-raid-farm.*`：每位玩家的袭击冷却，防止反复触发袭击农场（默认开启，`cooldown-seconds: 180`）。
+- `villager-restore.*`：`/hammercore restorevillagers [radius]` 把被 AntiVillagerLag 优化过的村民
+  恢复为原始状态（清除插件标记、恢复 AI 与名称；默认半径 50，玩家默认拥有权限）。
 - `projectkorra.*`、`brewery.*`、`minecart.*`、`integrations.*`：各联动功能。
 - `messages.yml`：所有命令、提示、警告和广播文本。
 

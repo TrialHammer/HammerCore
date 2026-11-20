@@ -140,6 +140,13 @@ public class ConfigManager extends BaseManager {
     public static double SNOWBALL_VELOCITY_MULTIPLIER;
     public static double SNOWBALL_DAMAGE;
 
+    public static boolean ANTI_RAID_FARM_ENABLED;
+    public static long ANTI_RAID_FARM_COOLDOWN_SECONDS;
+    public static String ANTI_RAID_FARM_BYPASS_PERMISSION;
+
+    public static int VILLAGER_RESTORE_DEFAULT_RADIUS;
+    public static int VILLAGER_RESTORE_MAX_RADIUS;
+
     public ConfigManager() {
         config = HammerCore.getInstance().getConfig();
     }
@@ -284,6 +291,11 @@ public class ConfigManager extends BaseManager {
         SNOWBALL_ENABLED = config.getBoolean("snowball.enabled", true);
         SNOWBALL_VELOCITY_MULTIPLIER = config.getDouble("snowball.velocity-multiplier", 2.0D);
         SNOWBALL_DAMAGE = config.getDouble("snowball.damage", 3.0D);
+        ANTI_RAID_FARM_ENABLED = config.getBoolean("anti-raid-farm.enabled", true);
+        ANTI_RAID_FARM_COOLDOWN_SECONDS = config.getLong("anti-raid-farm.cooldown-seconds", 180L);
+        ANTI_RAID_FARM_BYPASS_PERMISSION = config.getString("anti-raid-farm.bypass-permission", "hammercore.antiraidfarm.bypass");
+        VILLAGER_RESTORE_DEFAULT_RADIUS = config.getInt("villager-restore.default-radius", 50);
+        VILLAGER_RESTORE_MAX_RADIUS = config.getInt("villager-restore.max-radius", 50);
 
         World world = Bukkit.getWorld(Objects.requireNonNull(config.getString("util.auto-respawn.location.world")));
         UTIL_AUTO_RESPAWN_LOCATION = new Location(world,
@@ -355,9 +367,11 @@ public class ConfigManager extends BaseManager {
             changed = true;
         }
 
+        // v7: port anti raid farm (anti-raid-farm.*) and AntiVillagerLag's
+        // villager restore command (villager-restore.*).
         int version = config.getInt("settings.version", 0);
-        if (version < 6) {
-            config.set("settings.version", 6);
+        if (version < 7) {
+            config.set("settings.version", 7);
             changed = true;
         }
 

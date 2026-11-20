@@ -49,7 +49,7 @@ public class MainCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
             List<String> returnList = new java.util.ArrayList<>(subCommandMap.keySet().stream().toList());
-            returnList.removeIf(s -> !s.startsWith(args[0]) || !sender.hasPermission("hammercore." + args[0]));
+            returnList.removeIf(s -> !s.startsWith(args[0]) || !sender.hasPermission("hammercore." + s));
             return returnList;
         }
 
