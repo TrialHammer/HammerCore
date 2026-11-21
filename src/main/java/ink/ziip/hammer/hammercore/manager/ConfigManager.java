@@ -112,7 +112,9 @@ public class ConfigManager extends BaseManager {
     public static double MINECART_NORMAL_MAX_SPEED;
     public static double MINECART_SPEED_CAP;
 
+    public static String BREWERY_MENG_PO_RECIPE_ID;
     public static String BREWERY_PREMIUM_MENG_PO_RECIPE;
+    public static String BREWERY_WINE_RECIPE_ID;
     public static String BREWERY_WINE_RECIPE;
     public static String BREWERY_MENG_PO_BEND_REMOVE_COMMAND;
     public static String BREWERY_MENG_PO_WARP_COMMAND;
@@ -264,8 +266,10 @@ public class ConfigManager extends BaseManager {
         MINECART_NORMAL_MAX_SPEED = config.getDouble("minecart.accelerator.normal-max-speed", 0.4);
         MINECART_SPEED_CAP = config.getDouble("minecart.accelerator.speed-cap", 2.0);
 
-        BREWERY_PREMIUM_MENG_PO_RECIPE = config.getString("brewery.quality-names.premium-meng-po");
-        BREWERY_WINE_RECIPE = config.getString("brewery.quality-names.wine");
+        BREWERY_MENG_PO_RECIPE_ID = config.getString("brewery.recipes.meng-po", "");
+        BREWERY_PREMIUM_MENG_PO_RECIPE = config.getString("brewery.quality-names.premium-meng-po", "优质孟婆汤");
+        BREWERY_WINE_RECIPE_ID = config.getString("brewery.recipes.wine", "");
+        BREWERY_WINE_RECIPE = config.getString("brewery.quality-names.wine", "红酒");
         BREWERY_MENG_PO_BEND_REMOVE_COMMAND = config.getString("brewery.commands.meng-po-bend-remove", "bend remove %player%");
         BREWERY_MENG_PO_WARP_COMMAND = config.getString("brewery.commands.meng-po-warp", "warp 元素祭坛 %player%");
         BREWERY_WINE_REWARD_COMMAND = config.getString("brewery.commands.wine-reward", "si give 23中秋巡礼-风滚草镇 1 %player%");
@@ -369,9 +373,10 @@ public class ConfigManager extends BaseManager {
 
         // v7: port anti raid farm (anti-raid-farm.*) and AntiVillagerLag's
         // villager restore command (villager-restore.*).
+        // v8: match BreweryX recipes by recipes.yml id as well as display name.
         int version = config.getInt("settings.version", 0);
-        if (version < 7) {
-            config.set("settings.version", 7);
+        if (version < 8) {
+            config.set("settings.version", 8);
             changed = true;
         }
 

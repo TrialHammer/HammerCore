@@ -1,7 +1,7 @@
 # HammerCore 1.4.0 for Paper 26.3
 # Every runtime switch/tunable is grouped here. Player-facing text lives in messages.yml.
 settings:
-  version: 7
+  version: 8
   enabled: true
   debug: false
 
@@ -199,6 +199,12 @@ minecart:
     speed-cap: 2.0
 
 brewery:
+  # 可选：BreweryX recipes.yml 中的配方 ID（recipes.yml 顶层的键名）。
+  # 留空则只按下方名称匹配。ID 或任意品质名称命中都会触发，
+  # 名称比较会忽略颜色代码、首尾空格与大小写。
+  recipes:
+    meng-po: ""
+    wine: ""
   quality-names:
     premium-meng-po: "优质孟婆汤"
     wine: "红酒"

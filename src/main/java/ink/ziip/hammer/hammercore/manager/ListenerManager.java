@@ -31,9 +31,11 @@ public class ListenerManager extends BaseManager {
             register(new PortalListener());
         }
 
+        // The brewery listener only depends on BreweryX. Requiring ProjectKorra
+        // here meant the Meng Po soup commands were never registered on servers
+        // without it, and silently did nothing.
         if (ConfigManager.BREWERY_ENABLED
-                && Bukkit.getPluginManager().getPlugin("BreweryX") != null
-                && Bukkit.getPluginManager().getPlugin("ProjectKorra") != null) {
+                && Bukkit.getPluginManager().getPlugin("BreweryX") != null) {
             register(new BreweryListener());
         }
 

@@ -41,7 +41,9 @@ PAPER_API_VERSION=1.21.11 bash scripts/build.sh
 - `anti-raid-farm.*`：每位玩家的袭击冷却，防止反复触发袭击农场（默认开启，`cooldown-seconds: 180`）。
 - `villager-restore.*`：`/hammercore restorevillagers [radius]` 把被 AntiVillagerLag 优化过的村民
   恢复为原始状态（清除插件标记、恢复 AI 与名称；默认半径 50，玩家默认拥有权限）。
-- `projectkorra.*`、`brewery.*`、`minecart.*`、`integrations.*`：各联动功能。
+- `brewery.*`：孟婆汤/红酒的特殊效果。`recipes.meng-po` / `recipes.wine` 填 BreweryX
+  `recipes.yml` 的配方 ID，`quality-names.*` 填显示名称；两者任一命中即可，比较时忽略颜色代码与大小写。
+- `projectkorra.*`、`minecart.*`、`integrations.*`：各联动功能。
 - `messages.yml`：所有命令、提示、警告和广播文本。
 
 > 展示框保护已迁移到 [CodFrame](https://modrinth.com/plugin/codframe)，由 CodFrame 自动导入
