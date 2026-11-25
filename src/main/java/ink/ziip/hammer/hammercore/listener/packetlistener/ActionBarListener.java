@@ -16,8 +16,9 @@ public class ActionBarListener extends BasePacketListener {
     public ActionBarListener() {
         super();
         actionBarPacketAdapter = new PacketAdapter(HammerCore.getInstance(), ListenerPriority.LOWEST, PacketType.Play.Server.SET_ACTION_BAR_TEXT) {
+            @Override
             public void onPacketSending(PacketEvent packetEvent) {
-                Player player = packetEvent.getPlayer();
+                Player player = getPacketPlayer(packetEvent);
                 if (player == null)
                     return;
                 if (packetEvent.getPacket().getMeta("signed").isPresent()) {

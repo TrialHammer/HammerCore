@@ -11,6 +11,7 @@ import ink.ziip.hammer.hammercore.api.listener.packetlistener.BasePacketListener
 import ink.ziip.hammer.hammercore.manager.ConfigManager;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -23,14 +24,19 @@ public class ArchitectureItemListener extends BasePacketListener {
     public ArchitectureItemListener() {
         super();
         packetAdapter = new PacketAdapter(HammerCore.getInstance(), ListenerPriority.HIGH, PacketType.Play.Server.SET_SLOT, PacketType.Play.Server.WINDOW_ITEMS) {
+            @Override
             public void onPacketSending(PacketEvent packetEvent) {
                 if (!ConfigManager.UTIL_ARCHITECTURE_LORE_HIDDEN) return;
-                if (packetEvent.getPlayer().hasPermission(ConfigManager.UTIL_ARCHITECTURE_HIDE_PERMISSION)) return;
+                Player player = getPacketPlayer(packetEvent);
+                if (player == null || player.hasPermission(ConfigManager.UTIL_ARCHITECTURE_HIDE_PERMISSION)) return;
+                GameMode gameMode = player.getGameMode();
+                if (gameMode != GameMode.SURVIVAL && gameMode != GameMode.ADVENTURE) return;
 
                 PacketContainer packetContainer = packetEvent.getPacket();
+                PacketType type = packetEvent.getPacketType();
 
-                if (packetEvent.getPacketType() == PacketType.Play.Server.SET_SLOT && (packetEvent.getPlayer().getGameMode() == GameMode.SURVIVAL || packetEvent.getPlayer().getGameMode() == GameMode.ADVENTURE)) {
-                    StructureModifier<ItemStack> items = packetEvent.getPacket().getItemModifier();
+                if (type == PacketType.Play.Server.SET_SLOT) {
+                    StructureModifier<ItemStack> items = packetContainer.getItemModifier();
 
                     ItemStack itemStack = items.read(0);
 
@@ -47,8 +53,8 @@ public class ArchitectureItemListener extends BasePacketListener {
                     }
                 }
 
-                if (packetEvent.getPacketType() == PacketType.Play.Server.WINDOW_ITEMS && (packetEvent.getPlayer().getGameMode() == GameMode.SURVIVAL || packetEvent.getPlayer().getGameMode() == GameMode.ADVENTURE)) {
-                    List<ItemStack> itemStacks = packetEvent.getPacket().getItemListModifier().read(0);
+                if (type == PacketType.Play.Server.WINDOW_ITEMS) {
+                    List<ItemStack> itemStacks = packetContainer.getItemListModifier().read(0);
                     for (ItemStack itemStack : itemStacks) {
                         if (itemStack != null && itemStack.getType() != Material.AIR && itemStack.getItemMeta() != null && itemStack.getItemMeta().getLore() != null) {
                             itemStack.getItemMeta().getLore().forEach(
