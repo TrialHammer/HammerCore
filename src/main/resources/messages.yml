@@ -10,6 +10,21 @@ command:
   status: "&6HammerCore %version% &7| 启用：%enabled% | 信息栏：%info_bar% | 动作栏：%action_bar%"
   status-enabled: "&a是"
   status-disabled: "&c否"
+feature-state:
+  active: "&a运行中"
+  disabled: "&7配置已关闭"
+  dependency: "&e前置插件未安装或未启用"
+  standalone: "&e独立插件正在运行，HammerCore 未重复接管"
+  waiting: "&e等待 RealisticSeasons 温度系统就绪"
+  unavailable: "&c未能启动，请查看控制台"
+cauldron-interact:
+  upgraded: "&a发射器已升级，可以使用炼药锅自动化功能。"
+  status: "&6炼药锅自动化 &7| %state%"
+  status-switches: "&7加水：%water% &7| 装瓶：%bottle% &7| 投料：%ingredient% &7| 升级要求：%upgrade% &7| 蒸馏运行：%distillation%"
+element-temperature:
+  status: "&6元素温度 &7| %state%"
+  status-details: "&7安全范围：&f%minimum%~%maximum% &7| 火：&f%fire% &7| 水：&f%water% &7| 周期：&f%interval%t &7| 已校正玩家：&f%count%"
+  status-player: "&7- &f%player% &8[%element%/%season%] &7温度：&f%temperature% &7修正：&f%modifier%"
 admin:
   effect-names:
     SLOWNESS: "迟缓"

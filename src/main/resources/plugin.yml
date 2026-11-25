@@ -12,6 +12,9 @@ softdepend:
   - ProjectKorra
   - BreweryX
   - CoreProtect
+  - RealisticSeasons
+  - CauldronInteract
+  - ElementTemperature
 commands:
   hammercore:
     description: Core command.
@@ -19,6 +22,15 @@ commands:
   menu:
     description: Opening menu command.
     usage: /<command>
+  cauldroninteract:
+    description: Shows cauldron automation status or reloads HammerCore configuration.
+    usage: /<command> <status|reload>
+    permission: cauldroninteract.admin
+    aliases: [ci]
+  elementtemp:
+    description: Shows element temperature status or reloads HammerCore configuration.
+    usage: /<command> <status|reload>
+    permission: elementtemperature.admin
 permissions:
   hammercore.admin:
     description: Grants all HammerCore administrative commands.
@@ -34,9 +46,20 @@ permissions:
       hammercore.ride: true
       hammercore.say: true
       hammercore.toggle: true
+      cauldroninteract.admin: true
+      elementtemperature.admin: true
   hammercore.restorevillagers:
     description: Restores optimised villagers to their original state.
     default: true
   hammercore.antiraidfarm.bypass:
     description: Bypass the anti raid farm cooldown.
     default: op
+  cauldroninteract.admin:
+    description: Shows cauldron automation status and reloads its settings.
+    default: op
+  elementtemperature.admin:
+    description: Shows element temperature status and reloads its settings.
+    default: op
+  elementtemperature.exempt:
+    description: Exempts the player from HammerCore's element temperature correction.
+    default: false

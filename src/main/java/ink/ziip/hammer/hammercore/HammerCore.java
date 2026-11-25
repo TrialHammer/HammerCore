@@ -16,6 +16,7 @@ public final class HammerCore extends JavaPlugin {
     private PlaceholderExpansionManager placeholderExpansionManager;
     private TaskManager taskManager;
     private ListenerManager listenerManager;
+    private FeatureManager featureManager;
 
     public HammerCore() {
         instance = this;
@@ -36,6 +37,7 @@ public final class HammerCore extends JavaPlugin {
         configManager.load();
         messageManager = new MessageManager();
         messageManager.load();
+        featureManager = new FeatureManager(this);
 
         commandManager = new CommandManager();
         commandManager.load();
@@ -56,10 +58,12 @@ public final class HammerCore extends JavaPlugin {
 
         listenerManager = new ListenerManager();
         listenerManager.load();
+        featureManager.load();
     }
 
     @Override
     public void onDisable() {
+        if (featureManager != null) featureManager.unload();
         if (listenerManager != null) listenerManager.unload();
         if (taskManager != null) taskManager.unload();
         if (packetListenerManager != null) packetListenerManager.unload();
@@ -84,10 +88,15 @@ public final class HammerCore extends JavaPlugin {
         return configManager;
     }
 
+    public FeatureManager getFeatureManager() {
+        return featureManager;
+    }
+
     /** Reloads YAML, messages, permissions and re-registers listeners and tasks. */
     public void reloadRuntimeConfiguration() {
         configManager.reload();
         messageManager.reload();
+        featureManager.unload();
 
         if (!Boolean.TRUE.equals(ConfigManager.SETTINGS_ENABLED)) {
             if (listenerManager != null) {
@@ -118,6 +127,7 @@ public final class HammerCore extends JavaPlugin {
             listenerManager = new ListenerManager();
         }
         listenerManager.reload();
+        featureManager.load();
         if (ConfigManager.SETTINGS_DEBUG) {
             getLogger().info("Reloaded HammerCore configuration and messages.");
         }

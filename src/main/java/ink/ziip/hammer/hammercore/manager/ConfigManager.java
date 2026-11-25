@@ -374,9 +374,10 @@ public class ConfigManager extends BaseManager {
         // v7: port anti raid farm (anti-raid-farm.*) and AntiVillagerLag's
         // villager restore command (villager-restore.*).
         // v8: match BreweryX recipes by recipes.yml id as well as display name.
+        // v9: add cauldron-interact.* and element-temperature.*.
         int version = config.getInt("settings.version", 0);
-        if (version < 8) {
-            config.set("settings.version", 8);
+        if (version < 9) {
+            config.set("settings.version", 9);
             changed = true;
         }
 

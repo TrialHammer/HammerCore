@@ -1,8 +1,63 @@
 # HammerCore 1.4.0 for Paper 26.3
 # Every runtime switch/tunable is grouped here. Player-facing text lives in messages.yml.
 settings:
-  version: 8
+  version: 9
   enabled: true
+  debug: false
+
+# BreweryX automation. Requires BreweryX. The hoe-upgrade requirement is optional.
+cauldron-interact:
+  enabled: true
+  features:
+    water-fill:
+      enabled: true
+    bottle-fill:
+      enabled: true
+    ingredient:
+      enabled: true
+    dispenser-upgrade:
+      enabled: false
+      consume-durability: true
+      send-message: true
+    distillation:
+      enabled: true
+      track-chunk-loads: true
+      track-block-place: true
+      check-interval-ticks: 10
+      initial-delay-ticks: 10
+      # BreweryX still validates the actual catalyst and distillation recipe.
+      ingredient-material: GLOWSTONE_DUST
+  behaviour:
+    drop-offset: {x: 0.5, y: -0.75, z: 0.5}
+    deferred-inventory-delay-ticks: 1
+    return-empty-containers: true
+    fill-cauldron-to-maximum: true
+    consume-one-water-level-per-bottle: true
+    bucket-suffixes: ["_BUCKET"]
+    bottle-materials: [POTION, SPLASH_POTION, LINGERING_POTION, EXPERIENCE_BOTTLE, DRAGON_BREATH, HONEY_BOTTLE]
+  effects:
+    sounds:
+      enabled: true
+      bottle-fill: {key: "minecraft:item.bottle.fill", volume: 1.0, pitch: 1.0}
+      bucket-empty: {key: "minecraft:item.bucket.empty", volume: 1.0, pitch: 1.0}
+      upgrade: {key: "minecraft:item.honeycomb.wax_on", volume: 1.0, pitch: 1.0}
+    upgrade-particles:
+      enabled: true
+      particle: WAX_ON
+      count: 5
+      offset: {x: 0.5, y: 1.1, z: 0.5}
+
+# ProjectKorra fire/water temperature correction. Requires RealisticSeasons and ProjectKorra.
+element-temperature:
+  enabled: true
+  check-interval-ticks: 20
+  targets: {fire: 26, water: 14}
+  safety:
+    margin: 6
+    fallback-min: -8
+    fallback-max: 60
+  respect-exempt-permission: true
+  priority: [fire, water]
   debug: false
 
 info-bar:

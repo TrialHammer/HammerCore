@@ -2,6 +2,7 @@ package ink.ziip.hammer.hammercore.manager;
 
 import ink.ziip.hammer.hammercore.HammerCore;
 import ink.ziip.hammer.hammercore.api.manager.BaseManager;
+import ink.ziip.hammer.hammercore.command.FeatureCommand;
 import ink.ziip.hammer.hammercore.command.MainCommand;
 import ink.ziip.hammer.hammercore.command.MenuCommand;
 import ink.ziip.hammer.hammercore.command.sub.AdminCommand;
@@ -56,6 +57,19 @@ public class CommandManager extends BaseManager {
             this.menuPluginCommand.setExecutor(this.menuCommand);
             this.menuPluginCommand.setTabCompleter(this.menuCommand);
         }
+
+        registerFeatureCommand("cauldroninteract", "cauldron-interact");
+        registerFeatureCommand("elementtemp", "element-temperature");
+    }
+
+    private void registerFeatureCommand(String name, String feature) {
+        var core = HammerCore.getInstance();
+        PluginCommand command = core.getCommand(name);
+        if (command != null) {
+            FeatureCommand executor = new FeatureCommand(core, feature);
+            command.setExecutor(executor);
+            command.setTabCompleter(executor);
+        }
     }
 
     @Override
@@ -68,6 +82,10 @@ public class CommandManager extends BaseManager {
 
             if (corePluginCommand != null) corePluginCommand.unregister(commandMap);
             if (menuPluginCommand != null) menuPluginCommand.unregister(commandMap);
+            for (String name : new String[]{"cauldroninteract", "elementtemp"}) {
+                PluginCommand command = HammerCore.getInstance().getCommand(name);
+                if (command != null) command.unregister(commandMap);
+            }
         } catch (Exception e) {
             HammerCore.getInstance().getLogger().log(Level.WARNING, "Unregister commands failed.");
         }
