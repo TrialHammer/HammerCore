@@ -2,6 +2,7 @@ package ink.ziip.hammer.hammercore;
 
 import ink.ziip.hammer.hammercore.api.object.location.WoodLocation;
 import ink.ziip.hammer.hammercore.api.object.user.HammerUser;
+import ink.ziip.hammer.hammercore.feature.nexo.NexoIntegration;
 import ink.ziip.hammer.hammercore.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -17,6 +18,7 @@ public final class HammerCore extends JavaPlugin {
     private TaskManager taskManager;
     private ListenerManager listenerManager;
     private FeatureManager featureManager;
+    private NexoIntegration nexoIntegration;
 
     public HammerCore() {
         instance = this;
@@ -42,6 +44,9 @@ public final class HammerCore extends JavaPlugin {
         commandManager = new CommandManager();
         commandManager.load();
 
+        nexoIntegration = new NexoIntegration(this);
+        nexoIntegration.start();
+
         if (!Boolean.TRUE.equals(ConfigManager.SETTINGS_ENABLED)) {
             getLogger().info("HammerCore features are disabled via settings.enabled; use /hammercore reload after enabling.");
             return;
@@ -63,6 +68,7 @@ public final class HammerCore extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (nexoIntegration != null) nexoIntegration.stop();
         if (featureManager != null) featureManager.unload();
         if (listenerManager != null) listenerManager.unload();
         if (taskManager != null) taskManager.unload();
@@ -97,6 +103,7 @@ public final class HammerCore extends JavaPlugin {
         configManager.reload();
         messageManager.reload();
         featureManager.unload();
+        nexoIntegration.refreshGameplay();
 
         if (!Boolean.TRUE.equals(ConfigManager.SETTINGS_ENABLED)) {
             if (listenerManager != null) {
